@@ -2,10 +2,10 @@
   "name": "understanding-typescript",
   "version": "1.0.0",
   "description": "Understanding TypeScript Course Setup",
-  "main": "app.js",
+  "main": "./dist",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server"
+    "start": "lite-server"
   },
   "keywords": [
     "typescript",
@@ -14,6 +14,7 @@
   "author": "Maximilian Schwarzmüller",
   "license": "ISC",
   "devDependencies": {
+    "lite-server": "^2.5.4",
     "ts-loader": "^7.0.3",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
