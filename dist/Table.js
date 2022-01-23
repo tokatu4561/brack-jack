@@ -1,13 +1,13 @@
 import { Deck } from "./Deck.js";
 import { Player } from "./Player.js";
 export class Table {
-    constructor(betDenominations = [5, 20, 50, 100]) {
+    constructor(userName = "you", betDenominations = [5, 20, 50, 100]) {
         this.gamePhase = "betting";
         this.betDenominations = betDenominations;
         this.deck = new Deck();
         this.players = [
             new Player("player1", "ai"),
-            new Player("player2", "ai"),
+            new Player(userName, "user"),
             new Player("player3", "ai"),
         ];
         this.house = new Player("house", "house");
@@ -18,7 +18,9 @@ export class Table {
     changeTurn() {
         switch (this.gamePhase) {
             case "betting":
-                this.getTurnPlayer().makeBet(this.betDenominations[2]);
+                if (this.getTurnPlayer().type == "ai") {
+                    this.getTurnPlayer().makeBet(this.betDenominations[2]);
+                }
                 if (this.onLastPlayer()) {
                     this.gamePhase = "acting";
                     this.turnCounter = 0;
@@ -26,7 +28,10 @@ export class Table {
                 }
                 break;
             case "acting":
-                this.evaluateMove(this.getTurnPlayer());
+                if (this.getTurnPlayer().type == "ai") {
+                    this.getTurnPlayer().takeAction("surrender");
+                    this.evaluateMove(this.getTurnPlayer());
+                }
                 if (this.onLastPlayer() && this.allPlayerActionsResolved()) {
                     this.gamePhase = "evaluatingWinners";
                     return;
@@ -45,14 +50,12 @@ export class Table {
         this.turnCounter++;
     }
     evaluateMove(player) {
-        const Decision = player.promptPlayer();
-        switch (Decision.action) {
+        switch (player.gameStatus) {
             case "surrender":
                 player.gameStatus = "surrender";
                 break;
             case "stand":
                 player.gameStatus = "stand";
-                player.makeBet(Decision.amount);
                 break;
             case "hit":
                 player.gameStatus = "hit";
@@ -61,7 +64,7 @@ export class Table {
             case "double":
                 player.gameStatus = "double";
                 player.getCard(this.deck.drawOne());
-                player.makeBet(Decision.amount * 2);
+                player.makeBet(player.bet * 2);
         }
         if (player.getHandScore() > 22) {
             player.gameStatus = "bust";
