@@ -1,7 +1,11 @@
+import { Card } from "./Card.js";
+
 class Deck {
   private cards: Card[];
   constructor() {
     this.cards = [];
+    this.startGame();
+    this.shuffle();
   }
 
   startGame() {
@@ -21,8 +25,8 @@ class Deck {
       "Q",
       "K",
     ];
-    for (let i = 1; i <= suits.length; i++) {
-      for (let l = 1; l <= ranks.length; i++) {
+    for (let i = 0; i < suits.length; i++) {
+      for (let l = 0; l < ranks.length; l++) {
         let card = new Card(suits[i], ranks[l]);
         this.cards.push(card);
       }
@@ -51,7 +55,7 @@ class Deck {
     this.shuffle();
   }
 
-  drawOne() {
+  public drawOne(): Card | undefined {
     return this.cards.pop();
   }
 }

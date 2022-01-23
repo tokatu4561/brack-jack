@@ -3,6 +3,7 @@ class Deck {
     constructor() {
         this.cards = [];
         this.startGame();
+        this.shuffle();
     }
     startGame() {
         const suits = ["H", "D", "C", "S"];
@@ -21,8 +22,8 @@ class Deck {
             "Q",
             "K",
         ];
-        for (let i = 1; i <= suits.length; i++) {
-            for (let l = 1; l <= ranks.length; l++) {
+        for (let i = 0; i < suits.length; i++) {
+            for (let l = 0; l < ranks.length; l++) {
                 let card = new Card(suits[i], ranks[l]);
                 this.cards.push(card);
             }
