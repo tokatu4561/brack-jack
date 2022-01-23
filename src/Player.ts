@@ -1,44 +1,43 @@
-import { Card } from "./Card";
+import { Card } from "./Card.js";
+import { GameDecision } from "./GameDecision.js";
 
-class Player {
-  private name: string;
-  private type: string;
-  private chips: number = 400;
-  private hand: Card[];
-  private gameStatus: string;
-  private bet: number;
+export class Player {
+  public name: string;
+  public type: string;
+  public chips: number = 400;
+  public hand: Card[];
+  public gameStatus: string;
+  public bet: number;
   private winAmount: number;
 
-  constructor(
-    name: string,
-    type: string,
-    gameType: string,
-    chips: number = 400
-  ) {
+  constructor(name: string, type: string, chips: number = 400) {
     // プレイヤーの手札
     this.name = name;
     this.hand = [];
+    this.type = type;
     this.chips = chips;
     this.bet = 0;
     this.winAmount = 0;
-    this.gameStatus = "betting";
+    this.gameStatus = "stand";
   }
 
   /*
-       ?Number userData : モデル外から渡されるパラメータ。nullになることもあります。
-       return GameDecision : 状態を考慮した上で、プレイヤーが行った決定。
+  //      ?Number userData : モデル外から渡されるパラメータ。nullになることもあります。
+  //      return GameDecision : 状態を考慮した上で、プレイヤーが行った決定。
 
-        このメソッドは、どのようなベットやアクションを取るべきかというプレイヤーの決定を取得します。プレイヤーのタイプ、ハンド、チップの状態を読み取り、GameDecisionを返します。パラメータにuserData使うことによって、プレイヤーが「user」の場合、このメソッドにユーザーの情報を渡すことができますし、プレイヤーが 「ai」の場合、 userDataがデフォルトとしてnullを使います。
-    */
-  promptPlayer(userData) {
-    //TODO: ここから挙動をコードしてください。
-  }
+  //       このメソッドは、どのようなベットやアクションを取るべきかというプレイヤーの決定を取得します。プレイヤーのタイプ、ハンド、チップの状態を読み取り、GameDecisionを返します。パラメータにuserData使うことによって、プレイヤーが「user」の場合、このメソッドにユーザーの情報を渡すことができますし、プレイヤーが 「ai」の場合、 userDataがデフォルトとしてnullを使います。
+  //   */
+  // public promptPlayer(userData = null) {
+  //   //TODO: ここから挙動をコードしてください。
+  //   if (userData) return new GameDecision(userData.gameStatus, 1);
+  //   return new GameDecision(this.gameStatus, 1);
+  // }
 
   /*
    * 合計が21を超える場合、手札の各エースについて、合計が21以下になるまで10を引く。
    * return Number : 手札の合計
    */
-  getHandScore(): number {
+  public getHandScore(): number {
     let aceCount = 0;
     let totalScore = this.hand.reduce(function (sum, card) {
       if (card.rank === "A") aceCount++;
@@ -53,5 +52,29 @@ class Player {
     }
 
     return totalScore;
+  }
+
+  public getCard(card: Card | undefined): void {
+    if (card === undefined) return;
+    this.hand.push(card);
+  }
+
+  public makeBet(bet: number): number {
+    this.bet = bet;
+    return this.bet;
+  }
+
+  //プレイヤーのアクションの選択。{'bet', 'surrender', 'stand', 'hit', 'double'}
+  public takeAction(action: string): void {
+    this.gameStatus = action;
+  }
+
+  public resetBetWithHand(): void {
+    this.hand = [];
+    this.bet = 0;
+  }
+
+  public receivePrizeAmount(): void {
+    this.chips += this.winAmount;
   }
 }
