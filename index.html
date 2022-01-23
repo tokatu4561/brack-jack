@@ -12,6 +12,11 @@
       crossorigin="anonymous"
     />
 
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+
     <!-- fontawesome -->
     <link
       href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
@@ -27,24 +32,187 @@
       class="bg-green d-flex justify-content-center align-items-center vh-100"
     >
       <!-- login form div -->
-      <div>
-        <p class="text-white">Welcome to Card Game!</p>
+      <div id="start-form">
+        <p class="text-white">Welcome to Black Jack!</p>
         <!-- name field div -->
         <div>
-          <input type="text" placeholder="name" />
-        </div>
-        <!-- game type div -->
-        <div>
-          <select class="w-100">
-            <option value="blackjack">Blackjack</option>
-            <option value="poker">Poker</option>
-          </select>
+          <input id="user-name" value="" type="text" placeholder="name" />
         </div>
         <!-- submit div -->
         <div>
           <button id="game-start" class="btn btn-success">
             ゲームを開始する
           </button>
+        </div>
+      </div>
+
+      <!-- all cards (dealer, players) div -->
+      <div id="game-table" class="d-none col-12">
+        <div class="pt-5">
+          <p class="m-0 text-center text-white rem3">Dealer</p>
+
+          <!-- House Card Row -->
+          <div
+            id="houesCardDiv"
+            class="d-flex justify-content-center pt-3 pb-5"
+          >
+            <div class="bg-white border mx-2">
+              <div class="text-center">
+                <img
+                  src="/img/dashboard/lessons/projects/spade.png"
+                  alt=""
+                  width="50"
+                  height="50"
+                />
+              </div>
+              <div class="text-center">
+                <p class="m-0">7</p>
+              </div>
+            </div>
+
+            <div class="bg-white border mx-2">
+              <div class="text-center">
+                <img
+                  src="/img/dashboard/lessons/projects/diamond.png"
+                  alt=""
+                  width="50"
+                  height="50"
+                />
+              </div>
+              <div class="text-center">
+                <p class="m-0">8</p>
+              </div>
+            </div>
+
+            <div class="bg-white border mx-2">
+              <div class="text-center">
+                <img
+                  src="/img/dashboard/lessons/projects/heart.png"
+                  alt=""
+                  width="50"
+                  height="50"
+                />
+              </div>
+              <div class="text-center">
+                <p class="m-0">9</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="">
+          <!-- players -->
+          <div id="players" class="d-flex justify-content-center"></div>
+          <!-- end players -->
+
+          <!-- action-and-betting-->
+          <div
+            id="action-and-betting-form"
+            class="d-flex justify-content-center"
+          >
+            <div id="betting" class="d-flex flex-column w-50">
+              <div class="py-2 d-flex justify-content-between">
+                <div>
+                  <button id="bet-5" data-bet="5" class="betting-item coin red">
+                    5
+                  </button>
+                  <p class="text-white text-center">5</p>
+                </div>
+                <div>
+                  <button
+                    id="bet-20"
+                    data-bet="20"
+                    class="betting-item coin orange"
+                  >
+                    20
+                  </button>
+                  <p class="text-white text-center">20</p>
+                </div>
+                <div>
+                  <button
+                    id="bet-50"
+                    data-bet="50"
+                    class="betting-item coin orange"
+                  >
+                    50
+                  </button>
+                  <p class="text-white text-center">50</p>
+                </div>
+                <!-- end betChoiceDiv -->
+                <!-- betChoiceDiv -->
+                <div>
+                  <button
+                    id="bet-100"
+                    data-bet="100"
+                    class="betting-item coin orange"
+                  >
+                    100
+                  </button>
+                  <p class="text-white text-center">100</p>
+                </div>
+                <!-- end betChoiceDiv -->
+              </div>
+              <!-- end bestSelectionDiv -->
+              <!-- betSubmitDiv -->
+              <p
+                id="bet-total"
+                class="mb-4 font-bold bold bg-primary text-white text-center"
+              >
+                100
+              </p>
+              <button
+                id="btn-reset"
+                class="mb-4 w-100 btn-primary rem5 text-center bg-primary"
+              >
+                リセット
+              </button>
+              <button
+                type="button"
+                id="bet-btn"
+                class="w-100 btn-success rem5 text-center bg-primary"
+              >
+                ベットしてください
+              </button>
+            </div>
+            <!-- end betsDiv-->
+
+            <div id="acting" class="d-flex flex-wrap w-70 d-none">
+              <div class="py-2">
+                <a
+                  id="btn-surrender"
+                  data-action="surrender"
+                  class="text-dark btn btn-light px-5 py-1"
+                  >Surrender</a
+                >
+              </div>
+              <div class="py-2">
+                <a
+                  id="btn-stand"
+                  data-action="stand"
+                  class="btn btn-success px-5 py-1"
+                  >Stand</a
+                >
+              </div>
+              <div class="py-2">
+                <a
+                  id="btn-hit"
+                  data-action="hit"
+                  class="btn btn-warning px-5 py-1"
+                  >Hit</a
+                >
+              </div>
+              <div class="py-2">
+                <a
+                  id="btn-double"
+                  data-action="double"
+                  class="btn btn-danger px-5 py-1"
+                  >Double</a
+                >
+              </div>
+            </div>
+            <!-- end actionsDiv -->
+          </div>
+          <!-- end actionsAndBetsDiv-->
         </div>
       </div>
     </div>
