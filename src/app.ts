@@ -12,6 +12,10 @@ const userNameInput = document.getElementById("user-name") as HTMLInputElement;
 const startBtn = document.getElementById("game-start") as HTMLButtonElement;
 const betBtn = document.getElementById("bet-btn") as HTMLButtonElement;
 const resetBetBtn = document.getElementById("btn-reset") as HTMLButtonElement;
+const surrenderBtn = document.getElementById("btn-surrender") as HTMLElement;
+const standBtn = document.getElementById("btn-stand") as HTMLElement;
+const hitBtn = document.getElementById("btn-hit") as HTMLElement;
+const doubleBtn = document.getElementById("btn-double") as HTMLElement;
 const betAmountItems = document.querySelectorAll(
   ".betting-item"
 ) as NodeListOf<HTMLElement>;
@@ -29,7 +33,9 @@ startBtn.addEventListener("click", function () {
 // プレイヤーがベットした後、画面を切り替える
 betBtn.addEventListener("click", function () {
   let total = parseInt(betTotal.textContent);
-  renderTable(table1, total);
+  table1.getTurnPlayer().makeBet(total);
+  table1.changeTurn();
+  renderTable(table1);
 });
 // ベット額を0にする
 resetBetBtn.addEventListener("click", function () {
@@ -42,6 +48,33 @@ for (let i = 0; i < betAmountItems.length; i++) {
     betTotal.textContent = total.toString();
   });
 }
+// standやdobleなどユーザがアクションをとった後、画面の表示を切り替える
+surrenderBtn.addEventListener("click", function () {
+  table1.getTurnPlayer().takeAction(this.dataset.action);
+  table1.evaluateMove(table1.getTurnPlayer());
+  table1.changeTurn();
+  renderTable(table1);
+});
+standBtn.addEventListener("click", function () {
+  table1.getTurnPlayer().takeAction(this.dataset.action);
+  table1.evaluateMove(table1.getTurnPlayer());
+  table1.changeTurn();
+  renderTable(table1);
+});
+hitBtn.addEventListener("click", function () {
+  table1.getTurnPlayer().takeAction(this.dataset.action);
+  table1.evaluateMove(table1.getTurnPlayer());
+  if (table1.getTurnPlayer().gameStatus === "bust") {
+    table1.changeTurn();
+  }
+  renderTable(table1);
+});
+doubleBtn.addEventListener("click", function () {
+  table1.getTurnPlayer().takeAction(this.dataset.action);
+  table1.evaluateMove(table1.getTurnPlayer());
+  table1.changeTurn();
+  renderTable(table1);
+});
 
 function showPage(el: HTMLElement) {
   el.classList.remove("d-none");
@@ -50,19 +83,33 @@ function hidePage(el: HTMLElement) {
   el.classList.remove("d-flex");
   el.classList.add("d-none");
 }
+// ベット額の合計を算出する
+function betSummation(
+  inputElement: HTMLElement,
+  multiplierAttribute: string
+): number {
+  let value = 0;
+  let total = parseInt(betTotal.textContent); //現在の合計
 
-// テーブルの状態を表示させる
-function renderTable(table: Table, userInput: number = null): void {
+  if (inputElement.hasAttribute(multiplierAttribute)) {
+    value = parseInt(inputElement.getAttribute(multiplierAttribute));
+  }
+
+  // 入力が正の整数かどうか
+  if (value > 0) total += value;
+
+  return total;
+}
+
+// ユーザーの入力を受け取り、新しいテーブルの状態を表示させる
+function renderTable(table: Table): void {
   if (table.getTurnPlayer().type == "user") {
     switch (table.gamePhase) {
       case "betting":
-        table.getTurnPlayer().makeBet(userInput);
         bettingController(table);
-        table.changeTurn();
         break;
       case "acting":
         actingController(table);
-        table.changeTurn();
         break;
       case "roundOver":
         console.log("game end");
@@ -174,22 +221,4 @@ function playerHands(player: Player): HTMLDivElement {
 
   container.append(handArea);
   return container;
-}
-
-// ベット額の合計を算出する
-function betSummation(
-  inputElement: HTMLElement,
-  multiplierAttribute: string
-): number {
-  let value = 0;
-  let total = parseInt(betTotal.textContent); //現在の合計
-
-  if (inputElement.hasAttribute(multiplierAttribute)) {
-    value = parseInt(inputElement.getAttribute(multiplierAttribute));
-  }
-
-  // 入力が正の整数かどうか
-  if (value > 0) total += value;
-
-  return total;
 }

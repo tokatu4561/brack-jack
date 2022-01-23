@@ -1,4 +1,3 @@
-import { GameDecision } from "./GameDecision.js";
 export class Player {
     constructor(name, type, chips = 400) {
         this.chips = 400;
@@ -9,11 +8,6 @@ export class Player {
         this.bet = 0;
         this.winAmount = 0;
         this.gameStatus = "stand";
-    }
-    promptPlayer(userData = null) {
-        if (userData)
-            return new GameDecision(userData.gameStatus, 1);
-        return new GameDecision(this.gameStatus, 1);
     }
     getHandScore() {
         let aceCount = 0;
@@ -38,6 +32,9 @@ export class Player {
     makeBet(bet) {
         this.bet = bet;
         return this.bet;
+    }
+    takeAction(action) {
+        this.gameStatus = action;
     }
     resetBetWithHand() {
         this.hand = [];

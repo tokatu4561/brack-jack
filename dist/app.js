@@ -8,6 +8,11 @@ const playerList = document.getElementById("players");
 const userNameInput = document.getElementById("user-name");
 const startBtn = document.getElementById("game-start");
 const betBtn = document.getElementById("bet-btn");
+const resetBetBtn = document.getElementById("btn-reset");
+const surrenderBtn = document.getElementById("btn-surrender");
+const standBtn = document.getElementById("btn-stand");
+const hitBtn = document.getElementById("btn-hit");
+const doubleBtn = document.getElementById("btn-double");
 const betAmountItems = document.querySelectorAll(".betting-item");
 const betTotal = document.getElementById("bet-total");
 startBtn.addEventListener("click", function () {
@@ -20,7 +25,12 @@ startBtn.addEventListener("click", function () {
 });
 betBtn.addEventListener("click", function () {
     let total = parseInt(betTotal.textContent);
-    renderTable(table1, total);
+    table1.getTurnPlayer().makeBet(total);
+    table1.changeTurn();
+    renderTable(table1);
+});
+resetBetBtn.addEventListener("click", function () {
+    betTotal.textContent = "0";
 });
 for (let i = 0; i < betAmountItems.length; i++) {
     betAmountItems[i].addEventListener("click", function () {
@@ -28,6 +38,32 @@ for (let i = 0; i < betAmountItems.length; i++) {
         betTotal.textContent = total.toString();
     });
 }
+surrenderBtn.addEventListener("click", function () {
+    table1.getTurnPlayer().takeAction(this.dataset.action);
+    table1.evaluateMove(table1.getTurnPlayer());
+    table1.changeTurn();
+    renderTable(table1);
+});
+standBtn.addEventListener("click", function () {
+    table1.getTurnPlayer().takeAction(this.dataset.action);
+    table1.evaluateMove(table1.getTurnPlayer());
+    table1.changeTurn();
+    renderTable(table1);
+});
+hitBtn.addEventListener("click", function () {
+    table1.getTurnPlayer().takeAction(this.dataset.action);
+    table1.evaluateMove(table1.getTurnPlayer());
+    if (table1.getTurnPlayer().gameStatus === "bust") {
+        table1.changeTurn();
+    }
+    renderTable(table1);
+});
+doubleBtn.addEventListener("click", function () {
+    table1.getTurnPlayer().takeAction(this.dataset.action);
+    table1.evaluateMove(table1.getTurnPlayer());
+    table1.changeTurn();
+    renderTable(table1);
+});
 function showPage(el) {
     el.classList.remove("d-none");
 }
@@ -35,17 +71,24 @@ function hidePage(el) {
     el.classList.remove("d-flex");
     el.classList.add("d-none");
 }
-function renderTable(table, userInput = null) {
+function betSummation(inputElement, multiplierAttribute) {
+    let value = 0;
+    let total = parseInt(betTotal.textContent);
+    if (inputElement.hasAttribute(multiplierAttribute)) {
+        value = parseInt(inputElement.getAttribute(multiplierAttribute));
+    }
+    if (value > 0)
+        total += value;
+    return total;
+}
+function renderTable(table) {
     if (table.getTurnPlayer().type == "user") {
         switch (table.gamePhase) {
             case "betting":
-                table.getTurnPlayer().makeBet(userInput);
                 bettingController(table);
-                table.changeTurn();
                 break;
             case "acting":
                 actingController(table);
-                table.changeTurn();
                 break;
             case "roundOver":
                 console.log("game end");
@@ -142,15 +185,5 @@ function playerHands(player) {
     }
     container.append(handArea);
     return container;
-}
-function betSummation(inputElement, multiplierAttribute) {
-    let value = 0;
-    let total = parseInt(betTotal.textContent);
-    if (inputElement.hasAttribute(multiplierAttribute)) {
-        value = parseInt(inputElement.getAttribute(multiplierAttribute));
-    }
-    if (value > 0)
-        total += value;
-    return total;
 }
 //# sourceMappingURL=app.js.map

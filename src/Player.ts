@@ -1,5 +1,4 @@
 import { Card } from "./Card.js";
-import { GameDecision } from "./GameDecision.js";
 
 export class Player {
   public name: string;
@@ -24,7 +23,6 @@ export class Player {
   /*
   //      ?Number userData : モデル外から渡されるパラメータ。nullになることもあります。
   //      return GameDecision : 状態を考慮した上で、プレイヤーが行った決定。
-
   //       このメソッドは、どのようなベットやアクションを取るべきかというプレイヤーの決定を取得します。プレイヤーのタイプ、ハンド、チップの状態を読み取り、GameDecisionを返します。パラメータにuserData使うことによって、プレイヤーが「user」の場合、このメソッドにユーザーの情報を渡すことができますし、プレイヤーが 「ai」の場合、 userDataがデフォルトとしてnullを使います。
   //   */
   // public promptPlayer(userData = null) {
