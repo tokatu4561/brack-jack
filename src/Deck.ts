@@ -33,7 +33,7 @@ class Deck {
     }
   }
 
-  shuffle() {
+  public shuffle() {
     const deckSize = this.cards.length;
 
     // 最後から始めて、ランダムにスワップを選択してから左の要素(i--)に移動
@@ -49,7 +49,7 @@ class Deck {
   }
 
   //  カードが尽きることがないように、各ラウンドの後にデッキをリセットしてシャッフル。
-  resetDeck(): void {
+  public resetDeck(): void {
     this.cards = [];
     this.startGame();
     this.shuffle();

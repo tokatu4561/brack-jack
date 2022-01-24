@@ -15,12 +15,14 @@ export class Card {
    */
   getRankNumber(): number {
     switch (this.rank) {
-      case "J" || "Q" || "K":
+      case "J":
         return 10;
-        break;
+      case "Q":
+        return 10;
+      case "K":
+        return 10;
       case "A":
         return 11;
-        break;
       default:
         return Number(this.rank);
     }
