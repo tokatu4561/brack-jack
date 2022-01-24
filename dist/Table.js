@@ -13,6 +13,8 @@ export class Table {
         this.house = new Player("house", "house");
         this.gamePhase = "betting";
         this.turnCounter = 0;
+        this.resultsLog = [];
+        this.house.getCard(this.deck.drawOne());
         this.blackjackAssignPlayerHands();
     }
     changeTurn() {
@@ -38,13 +40,17 @@ export class Table {
                 }
                 break;
             case "evaluatingWinners":
+                this.dealerAction();
+                this.addResultLogs();
                 this.gamePhase = "roundOver";
+                return;
+            case "roundOver":
                 const winners = this.winnerGame();
                 for (let winner of winners) {
                     winner.receivePrizeAmount();
                     console.log(winner.name);
                 }
-                this.blackjackClearPlayerHandsAndBets();
+                this.turnCounter = 0;
                 return;
         }
         this.turnCounter++;
@@ -87,10 +93,16 @@ export class Table {
     winnerGame() {
         let winners = [];
         for (let player of this.players) {
+            console.log(this.house.getHandScore());
+            console.log(player.getHandScore());
             if (player.gameStatus === "bust")
                 continue;
-            if (this.house.getHandScore() < player.getHandScore())
+            if (player.gameStatus === "surrender")
+                continue;
+            if (this.house.gameStatus == "bust" ||
+                this.house.getHandScore() < player.getHandScore()) {
                 winners.push(player);
+            }
         }
         return winners;
     }
@@ -109,7 +121,6 @@ export class Table {
     }
     allPlayerActionsResolved() {
         const gameStatus = {
-            broken: "broken",
             bust: "bust",
             stand: "stand",
             surrender: "surrender",
@@ -121,6 +132,31 @@ export class Table {
                 return false;
         }
         return true;
+    }
+    addResultLogs() {
+        let logs = [];
+        for (let player of this.players) {
+            let log = {};
+            log["name"] = player.name;
+            log["action"] = player.gameStatus;
+            log["bet"] = player.bet.toString();
+            log["won"] = player.winAmount.toString();
+            logs.push(log);
+        }
+        this.resultsLog.push(logs);
+    }
+    dealerAction() {
+        while (this.house.getHandScore() < 18) {
+            this.house.takeAction("hit");
+            this.evaluateMove(this.house);
+        }
+    }
+    startNextGame() {
+        this.blackjackClearPlayerHandsAndBets();
+        this.blackjackAssignPlayerHands();
+        this.gamePhase = "betting";
+        this.house.hand = [];
+        this.house.getCard(this.deck.drawOne());
     }
 }
 //# sourceMappingURL=Table.js.map

@@ -3,12 +3,12 @@ import { Player } from "./Player.js";
 
 export class Table {
   public players: Player[];
-  private house: Player;
+  public house: Player;
   private deck: Deck;
   public gamePhase: string = "betting"; //{'betting', 'acting', 'evaluatingWinners','roundOver'} から選択
   private betDenominations: number[];
   private turnCounter: number;
-  //   private resultsLog: [];
+  public resultsLog: string[][];
 
   constructor(userName = "you", betDenominations = [5, 20, 50, 100]) {
     // プレイヤーが選択できるベットの単位。
@@ -24,8 +24,9 @@ export class Table {
     this.gamePhase = "betting";
     this.turnCounter = 0;
     // ラウンドの結果をログに記録するための文字列の配列。
-    // this.resultsLog = [];
+    this.resultsLog = [];
 
+    this.house.getCard(this.deck.drawOne());
     this.blackjackAssignPlayerHands();
   }
 
@@ -56,13 +57,17 @@ export class Table {
         }
         break;
       case "evaluatingWinners":
+        this.dealerAction();
+        this.addResultLogs();
         this.gamePhase = "roundOver";
+        return;
+      case "roundOver":
         const winners = this.winnerGame();
         for (let winner of winners) {
           winner.receivePrizeAmount();
           console.log(winner.name);
         }
-        this.blackjackClearPlayerHandsAndBets();
+        this.turnCounter = 0;
         return;
     }
 
@@ -92,7 +97,6 @@ export class Table {
         player.makeBet(player.bet * 2);
     }
 
-    //TODO: ここから挙動をコードしてください。
     if (player.getHandScore() > 22) {
       player.gameStatus = "bust";
       player.chips -= player.bet;
@@ -128,16 +132,23 @@ export class Table {
   private winnerGame(): Player[] {
     let winners = [];
     for (let player of this.players) {
+      console.log(this.house.getHandScore());
+      console.log(player.getHandScore());
       if (player.gameStatus === "bust") continue;
-      if (this.house.getHandScore() < player.getHandScore())
+      if (player.gameStatus === "surrender") continue;
+      if (
+        this.house.gameStatus == "bust" ||
+        this.house.getHandScore() < player.getHandScore()
+      ) {
         winners.push(player);
+      }
     }
     return winners;
   }
   /*
    *テーブル内のすべてのプレイヤーの状態を更新し、手札を空の配列に、ベットを0に設定
    */
-  private blackjackClearPlayerHandsAndBets(): void {
+  public blackjackClearPlayerHandsAndBets(): void {
     for (let player of this.players) {
       player.resetBetWithHand();
     }
@@ -151,17 +162,8 @@ export class Table {
   }
 
   /*
-   * return Boolean : テーブルがプレイヤー配列の最初のプレイヤーにフォーカスされている場合はtrue、そうでない場合はfalseを返します。
+   * return Boolean : テーブルがプレイヤー配列の最後のプレイヤーにフォーカスされている場合はtrue、そうでない場合はfalseを返します。
    */
-  //   private onFirstPlayer() {
-  //     if (this.turnCounter == 0) return true;
-
-  //     return false;
-  //   }
-
-  /*
-            return Boolean : テーブルがプレイヤー配列の最後のプレイヤーにフォーカスされている場合はtrue、そうでない場合はfalseを返します。
-        */
   private onLastPlayer(): boolean {
     if (this.turnCounter == this.players.length - 1) return true;
 
@@ -173,7 +175,6 @@ export class Table {
    */
   allPlayerActionsResolved(): boolean {
     const gameStatus: { [props: string]: string } = {
-      broken: "broken",
       bust: "bust",
       stand: "stand",
       surrender: "surrender",
@@ -184,5 +185,34 @@ export class Table {
     }
 
     return true;
+  }
+
+  //ラウンドの終わりに結果をログに追加する
+  public addResultLogs(): void {
+    let logs = [];
+    for (let player of this.players) {
+      let log = {};
+      log["name"] = player.name;
+      log["action"] = player.gameStatus;
+      log["bet"] = player.bet.toString();
+      log["won"] = player.winAmount.toString();
+      logs.push(log);
+    }
+    this.resultsLog.push(logs);
+  }
+
+  public dealerAction(): void {
+    while (this.house.getHandScore() < 18) {
+      this.house.takeAction("hit");
+      this.evaluateMove(this.house);
+    }
+  }
+
+  public startNextGame(): void {
+    this.blackjackClearPlayerHandsAndBets();
+    this.blackjackAssignPlayerHands();
+    this.gamePhase = "betting";
+    this.house.hand = [];
+    this.house.getCard(this.deck.drawOne());
   }
 }
