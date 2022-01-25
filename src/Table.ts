@@ -62,11 +62,7 @@ export class Table {
         this.gamePhase = "roundOver";
         return;
       case "roundOver":
-        const winners = this.winnerGame();
-        for (let winner of winners) {
-          winner.receivePrizeAmount();
-          console.log(winner.name);
-        }
+        this.evaluateGameWinners();
         this.turnCounter = 0;
         return;
     }
@@ -75,14 +71,15 @@ export class Table {
   }
 
   /*
-   *Player player : Playerの状態を更新します。
-   *return Null : このメソッドは、プレーヤの状態を更新するだけです。
+   *Player player : Playerのとった行動により状態を更新します。
    * EX:プレイヤーが「ヒット」し、手札が21以上の場合、gameStatusを「バスト」に設定し、チップからベットを引きます。
    */
   public evaluateMove(player: Player): void {
     switch (player.gameStatus) {
       case "surrender":
         player.gameStatus = "surrender";
+        player.winAmount = -(player.bet / 2);
+        player.receivePrizeAmount();
         break;
       case "stand":
         player.gameStatus = "stand";
@@ -99,14 +96,15 @@ export class Table {
 
     if (player.getHandScore() > 22) {
       player.gameStatus = "bust";
-      player.chips -= player.bet;
+      player.winAmount = -player.bet;
+      player.receivePrizeAmount();
     }
   }
 
   /*
-           return String : 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
-            NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
-        */
+   *return String : 新しいターンが始まる直前の全プレイヤーの状態を表す文字列。
+   * NOTE: このメソッドの出力は、各ラウンドの終了時にテーブルのresultsLogメンバを更新するために使用されます。
+   */
   blackjackEvaluateAndGetRoundResults() {
     if (this.onLastPlayer()) {
       this.allPlayerActionsResolved();
@@ -128,23 +126,26 @@ export class Table {
     }
   }
 
-  //   ゲームの勝者を返す
-  private winnerGame(): Player[] {
-    let winners = [];
+  //   プレイヤーとハウスの結果を評価し、勝者は残金、ベットの状態を更新する
+  private evaluateGameWinners() {
     for (let player of this.players) {
-      console.log(this.house.getHandScore());
-      console.log(player.getHandScore());
-      if (player.gameStatus === "bust") continue;
       if (player.gameStatus === "surrender") continue;
+      if (player.gameStatus === "bust") continue;
       if (
         this.house.gameStatus == "bust" ||
-        this.house.getHandScore() < player.getHandScore()
+        (this.house.getHandScore() < player.getHandScore() &&
+          player.gameStatus == "double")
       ) {
-        winners.push(player);
+        player.winAmount = player.bet * 2;
+        player.receivePrizeAmount();
+      } else {
+        // プレイヤーの状態がstandだった場合
+        player.winAmount = player.bet;
+        player.receivePrizeAmount();
       }
     }
-    return winners;
   }
+
   /*
    *テーブル内のすべてのプレイヤーの状態を更新し、手札を空の配列に、ベットを0に設定
    */

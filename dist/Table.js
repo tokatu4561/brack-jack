@@ -45,11 +45,7 @@ export class Table {
                 this.gamePhase = "roundOver";
                 return;
             case "roundOver":
-                const winners = this.winnerGame();
-                for (let winner of winners) {
-                    winner.receivePrizeAmount();
-                    console.log(winner.name);
-                }
+                this.evaluateGameResult();
                 this.turnCounter = 0;
                 return;
         }
@@ -59,6 +55,7 @@ export class Table {
         switch (player.gameStatus) {
             case "surrender":
                 player.gameStatus = "surrender";
+                player.winAmount = -(player.bet / 2);
                 break;
             case "stand":
                 player.gameStatus = "stand";
@@ -90,21 +87,25 @@ export class Table {
             }
         }
     }
-    winnerGame() {
-        let winners = [];
+    evaluateGameResult() {
         for (let player of this.players) {
-            console.log(this.house.getHandScore());
-            console.log(player.getHandScore());
-            if (player.gameStatus === "bust")
-                continue;
             if (player.gameStatus === "surrender")
                 continue;
+            if (player.gameStatus === "bust") {
+                player.winAmount = -player.bet;
+                player.receivePrizeAmount();
+            }
             if (this.house.gameStatus == "bust" ||
-                this.house.getHandScore() < player.getHandScore()) {
-                winners.push(player);
+                (this.house.getHandScore() < player.getHandScore() &&
+                    player.gameStatus == "double")) {
+                player.winAmount = player.bet * 2;
+                player.receivePrizeAmount();
+            }
+            else {
+                player.winAmount = player.bet;
+                player.receivePrizeAmount();
             }
         }
-        return winners;
     }
     blackjackClearPlayerHandsAndBets() {
         for (let player of this.players) {
