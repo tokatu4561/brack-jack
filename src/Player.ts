@@ -7,7 +7,7 @@ export class Player {
   public hand: Card[];
   public gameStatus: string;
   public bet: number;
-  private winAmount: number;
+  public winAmount: number;
 
   constructor(name: string, type: string, chips: number = 400) {
     // プレイヤーの手札
@@ -19,17 +19,6 @@ export class Player {
     this.winAmount = 0;
     this.gameStatus = "stand";
   }
-
-  /*
-  //      ?Number userData : モデル外から渡されるパラメータ。nullになることもあります。
-  //      return GameDecision : 状態を考慮した上で、プレイヤーが行った決定。
-  //       このメソッドは、どのようなベットやアクションを取るべきかというプレイヤーの決定を取得します。プレイヤーのタイプ、ハンド、チップの状態を読み取り、GameDecisionを返します。パラメータにuserData使うことによって、プレイヤーが「user」の場合、このメソッドにユーザーの情報を渡すことができますし、プレイヤーが 「ai」の場合、 userDataがデフォルトとしてnullを使います。
-  //   */
-  // public promptPlayer(userData = null) {
-  //   //TODO: ここから挙動をコードしてください。
-  //   if (userData) return new GameDecision(userData.gameStatus, 1);
-  //   return new GameDecision(this.gameStatus, 1);
-  // }
 
   /*
    * 合計が21を超える場合、手札の各エースについて、合計が21以下になるまで10を引く。

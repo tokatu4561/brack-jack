@@ -5,11 +5,14 @@ let table1;
 // const basePage = document.getElementById("gameDiv") as HTMLDivElement;
 const startPage = document.getElementById("start-form") as HTMLDivElement;
 const tablePage = document.getElementById("game-table") as HTMLDivElement;
+const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
 const bettingForm = document.getElementById("betting") as HTMLDivElement;
 const actingForm = document.getElementById("acting") as HTMLDivElement;
 const playerList = document.getElementById("players") as HTMLDivElement;
+const dealerCon = document.getElementById("dealer-hand") as HTMLDivElement;
 const userNameInput = document.getElementById("user-name") as HTMLInputElement;
 const startBtn = document.getElementById("game-start") as HTMLButtonElement;
+const nextGameBtn = document.getElementById("next-game") as HTMLButtonElement;
 const betBtn = document.getElementById("bet-btn") as HTMLButtonElement;
 const resetBetBtn = document.getElementById("btn-reset") as HTMLButtonElement;
 const surrenderBtn = document.getElementById("btn-surrender") as HTMLElement;
@@ -28,6 +31,10 @@ startBtn.addEventListener("click", function () {
     userName = "you";
   }
   table1 = new Table(userName);
+  renderTable(table1);
+});
+nextGameBtn.addEventListener("click", function () {
+  table1.startNextGame();
   renderTable(table1);
 });
 // プレイヤーがベットした後、画面を切り替える
@@ -101,7 +108,7 @@ function betSummation(
   return total;
 }
 
-// ユーザーの入力を受け取り、新しいテーブルの状態を表示させる
+// テーブルの状態を表示させる
 function renderTable(table: Table): void {
   if (table.getTurnPlayer().type == "user") {
     switch (table.gamePhase) {
@@ -111,11 +118,13 @@ function renderTable(table: Table): void {
       case "acting":
         actingController(table);
         break;
-      case "roundOver":
-        console.log("game end");
-        return;
     }
   } else {
+    if (table.gamePhase == "roundOver") {
+      roundOverController(table);
+      table.changeTurn();
+      return;
+    }
     waitingController(table);
     setTimeout(function () {
       table.changeTurn();
@@ -129,6 +138,9 @@ function waitingController(table1: Table): void {
   hidePage(bettingForm);
   hidePage(actingForm);
   showPage(tablePage);
+
+  dealerCon.innerHTML = "";
+  dealerCon.append(renderDealerHands(table1.house));
 
   playerList.innerHTML = ``;
   for (let player of table1.players) {
@@ -144,6 +156,8 @@ function actingController(table1: Table): void {
   hidePage(bettingForm);
   showPage(actingForm);
 
+  dealerCon.innerHTML = "";
+  dealerCon.append(renderDealerHands(table1.house));
   playerList.innerHTML = ``;
   for (let player of table1.players) {
     let playerArea = playerInfo(player);
@@ -158,6 +172,8 @@ function bettingController(table1: Table): void {
   hidePage(actingForm);
   showPage(bettingForm);
 
+  dealerCon.innerHTML = "";
+  dealerCon.append(renderDealerHands(table1.house));
   playerList.innerHTML = ``;
   for (let player of table1.players) {
     let playerArea = playerInfo(player);
@@ -166,6 +182,19 @@ function bettingController(table1: Table): void {
     ${playerArea.innerHTML}
   `;
   }
+}
+
+function roundOverController(table: Table): void {
+  dealerCon.append(renderDealerHands(table.house));
+  playerList.innerHTML = ``;
+  for (let player of table.players) {
+    let playerArea = playerInfo(player);
+
+    playerList.innerHTML += `
+    ${playerArea.innerHTML}
+  `;
+  }
+  printOutLogs(table.resultsLog);
 }
 
 function playerInfo(player: Player): HTMLDivElement {
@@ -177,10 +206,10 @@ function playerInfo(player: Player): HTMLDivElement {
             <p class="m-0 text-white text-center rem3">${player.name}</p>
 
             <!-- playerInfo -->
-            <div class="text-white d-flex m-0 p-0 justify-content-center">
-                <p class="rem1 text-left">status:${player.gameStatus} </a>
-                <p class="rem1 text-left">bet:${player.bet} </a>
-                <p class="rem1 text-left">balance:${player.chips} </a>
+            <div class="text-white pl-16 flex-col">
+                <p class="rem1 text-left">status:${player.gameStatus} </p>
+                <p class="rem1 text-left">bet:${player.bet} </p>
+                <p class="rem1 text-left">balance:${player.chips} </p>
             </div>
             
             ${handArea.innerHTML}
@@ -221,4 +250,30 @@ function playerHands(player: Player): HTMLDivElement {
 
   container.append(handArea);
   return container;
+}
+
+function renderDealerHands(player: Player): HTMLDivElement {
+  let container = document.createElement("div");
+  let handArea = playerHands(player) as HTMLDivElement;
+
+  container.innerHTML = `${handArea.innerHTML}`;
+  return container;
+}
+
+// ゲーム終了後結果のログを表示する
+function printOutLogs(logs: string[][]): void {
+  let container = document.createElement("div");
+  for (let i = 0; i < logs.length; i++) {
+    let round = document.createElement("div");
+    round.textContent = `round: ${i}`;
+    container.append(round);
+
+    for (let log of logs[i]) {
+      let row = document.createElement("li");
+      row.innerHTML = `name:${log["name"]}, action: ${log["action"]}, bet:${log["bet"]}, won: ${log["won"]}`;
+      container.append(row);
+    }
+  }
+
+  roundOverCon.append(container);
 }

@@ -2,11 +2,14 @@ import { Table } from "./Table.js";
 let table1;
 const startPage = document.getElementById("start-form");
 const tablePage = document.getElementById("game-table");
+const roundOverCon = document.getElementById("round-over");
 const bettingForm = document.getElementById("betting");
 const actingForm = document.getElementById("acting");
 const playerList = document.getElementById("players");
+const dealerCon = document.getElementById("dealer-hand");
 const userNameInput = document.getElementById("user-name");
 const startBtn = document.getElementById("game-start");
+const nextGameBtn = document.getElementById("next-game");
 const betBtn = document.getElementById("bet-btn");
 const resetBetBtn = document.getElementById("btn-reset");
 const surrenderBtn = document.getElementById("btn-surrender");
@@ -21,6 +24,10 @@ startBtn.addEventListener("click", function () {
         userName = "you";
     }
     table1 = new Table(userName);
+    renderTable(table1);
+});
+nextGameBtn.addEventListener("click", function () {
+    table1.startNextGame();
     renderTable(table1);
 });
 betBtn.addEventListener("click", function () {
@@ -90,12 +97,14 @@ function renderTable(table) {
             case "acting":
                 actingController(table);
                 break;
-            case "roundOver":
-                console.log("game end");
-                return;
         }
     }
     else {
+        if (table.gamePhase == "roundOver") {
+            roundOverController(table);
+            table.changeTurn();
+            return;
+        }
         waitingController(table);
         setTimeout(function () {
             table.changeTurn();
@@ -108,6 +117,8 @@ function waitingController(table1) {
     hidePage(bettingForm);
     hidePage(actingForm);
     showPage(tablePage);
+    dealerCon.innerHTML = "";
+    dealerCon.append(renderDealerHands(table1.house));
     playerList.innerHTML = ``;
     for (let player of table1.players) {
         let playerArea = playerInfo(player);
@@ -119,6 +130,8 @@ function waitingController(table1) {
 function actingController(table1) {
     hidePage(bettingForm);
     showPage(actingForm);
+    dealerCon.innerHTML = "";
+    dealerCon.append(renderDealerHands(table1.house));
     playerList.innerHTML = ``;
     for (let player of table1.players) {
         let playerArea = playerInfo(player);
@@ -130,6 +143,8 @@ function actingController(table1) {
 function bettingController(table1) {
     hidePage(actingForm);
     showPage(bettingForm);
+    dealerCon.innerHTML = "";
+    dealerCon.append(renderDealerHands(table1.house));
     playerList.innerHTML = ``;
     for (let player of table1.players) {
         let playerArea = playerInfo(player);
@@ -137,6 +152,17 @@ function bettingController(table1) {
     ${playerArea.innerHTML}
   `;
     }
+}
+function roundOverController(table) {
+    dealerCon.append(renderDealerHands(table.house));
+    playerList.innerHTML = ``;
+    for (let player of table.players) {
+        let playerArea = playerInfo(player);
+        playerList.innerHTML += `
+    ${playerArea.innerHTML}
+  `;
+    }
+    printOutLogs(table.resultsLog);
 }
 function playerInfo(player) {
     let container = document.createElement("div");
@@ -146,10 +172,10 @@ function playerInfo(player) {
             <p class="m-0 text-white text-center rem3">${player.name}</p>
 
             <!-- playerInfo -->
-            <div class="text-white d-flex m-0 p-0 justify-content-center">
-                <p class="rem1 text-left">status:${player.gameStatus} </a>
-                <p class="rem1 text-left">bet:${player.bet} </a>
-                <p class="rem1 text-left">balance:${player.chips} </a>
+            <div class="text-white pl-16 flex-col">
+                <p class="rem1 text-left">status:${player.gameStatus} </p>
+                <p class="rem1 text-left">bet:${player.bet} </p>
+                <p class="rem1 text-left">balance:${player.chips} </p>
             </div>
             
             ${handArea.innerHTML}
@@ -185,5 +211,25 @@ function playerHands(player) {
     }
     container.append(handArea);
     return container;
+}
+function renderDealerHands(player) {
+    let container = document.createElement("div");
+    let handArea = playerHands(player);
+    container.innerHTML = `${handArea.innerHTML}`;
+    return container;
+}
+function printOutLogs(logs) {
+    let container = document.createElement("div");
+    for (let i = 0; i < logs.length; i++) {
+        let round = document.createElement("div");
+        round.textContent = `round: ${i}`;
+        container.append(round);
+        for (let log of logs[i]) {
+            let row = document.createElement("li");
+            row.innerHTML = `name:${log["name"]}, action: ${log["action"]}, bet:${log["bet"]}, won: ${log["won"]}`;
+            container.append(row);
+        }
+    }
+    roundOverCon.append(container);
 }
 //# sourceMappingURL=app.js.map
