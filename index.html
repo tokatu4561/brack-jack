@@ -11,11 +11,12 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
-
+    <!-- 
     <link
       href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
       rel="stylesheet"
-    />
+    /> -->
+    <script src="https://cdn.tailwindcss.com/"></script>
 
     <!-- fontawesome -->
     <link
@@ -47,7 +48,7 @@
       </div>
 
       <!-- all cards (dealer, players) div -->
-      <div id="game-table" class="d-none col-12">
+      <div id="game-table" class="col-12">
         <div class="pt-5">
           <p class="m-0 text-center text-white rem3">Dealer</p>
 
@@ -71,69 +72,137 @@
             <div id="betting" class="d-flex flex-column w-50">
               <div class="py-2 d-flex justify-content-between">
                 <div>
-                  <button id="bet-5" data-bet="5" class="betting-item coin red">
+                  <button
+                    id="bet-5"
+                    data-bet="5"
+                    class="
+                      betting-item
+                      w-12
+                      h-12
+                      rounded-full
+                      shadow-lg
+                      bg-blue-400
+                      text-lg text-white
+                      font-semibold
+                      hover:bg-blue-500
+                      hover:shadow-sm
+                      hover:translate-y-0.5
+                      transform
+                      transition
+                    "
+                  >
                     5
                   </button>
-                  <p class="text-white text-center">5</p>
                 </div>
                 <div>
                   <button
                     id="bet-20"
                     data-bet="20"
-                    class="betting-item coin orange"
+                    class="
+                      betting-item
+                      w-12
+                      h-12
+                      shadow-lg
+                      bg-red-400
+                      text-white
+                      rounded-full
+                      hover:bg-red-600
+                      hover:shadow-sm
+                      hover:translate-y-0.5
+                      transform
+                      transition
+                    "
                   >
                     20
                   </button>
-                  <p class="text-white text-center">20</p>
                 </div>
                 <div>
                   <button
                     id="bet-50"
                     data-bet="50"
-                    class="betting-item coin orange"
+                    class="
+                      betting-item
+                      w-12
+                      h-12
+                      bg-slate-600
+                      text-white
+                      rounded-full
+                      hover:translate-y-0.5
+                      hover:bg-slate-700
+                      transform
+                      transition
+                    "
                   >
                     50
                   </button>
-                  <p class="text-white text-center">50</p>
                 </div>
-                <!-- end betChoiceDiv -->
-                <!-- betChoiceDiv -->
                 <div>
                   <button
                     id="bet-100"
                     data-bet="100"
-                    class="betting-item coin orange"
+                    class="
+                      betting-item
+                      w-12
+                      h-12
+                      bg-blue-300
+                      text-white
+                      rounded-full
+                      hover:bg-blue-400
+                      hover:shadow-sm
+                      hover:translate-y-0.5
+                      transform
+                      transition
+                    "
                   >
                     100
                   </button>
-                  <p class="text-white text-center">100</p>
                 </div>
-                <!-- end betChoiceDiv -->
               </div>
-              <!-- end bestSelectionDiv -->
-              <!-- betSubmitDiv -->
-              <p
-                id="bet-total"
-                class="mb-4 font-bold bold bg-primary text-white text-center"
-              >
-                100
-              </p>
-              <button
-                id="btn-reset"
-                class="mb-4 w-100 btn-primary rem5 text-center bg-primary"
-              >
-                リセット
-              </button>
-              <button
-                type="button"
-                id="bet-btn"
-                class="w-100 btn-success rem5 text-center bg-primary"
-              >
-                ベットしてください
-              </button>
+              <div class="bet-and-rest flex justify-around">
+                <button
+                  id="btn-reset"
+                  class="
+                    shadow-lg
+                    px-2
+                    py-1
+                    bg-blue-400
+                    text-lg text-white
+                    font-semibold
+                    rounded
+                    hover:bg-blue-500
+                    hover:shadow-sm
+                    hover:translate-y-0.5
+                    transform
+                    transition
+                  "
+                >
+                  リセット
+                </button>
+                <button
+                  type="button"
+                  id="bet-btn"
+                  class="
+                    shadow-lg
+                    px-2
+                    py-1
+                    bg-blue-400
+                    text-lg text-white
+                    font-semibold
+                    rounded
+                    hover:bg-blue-500
+                    hover:shadow-sm
+                    hover:translate-y-0.5
+                    transform
+                    transition
+                  "
+                >
+                  ベット
+                </button>
+              </div>
+              <p id="bet-total" class="text-white bg-blue-600 text-center">0</p>
             </div>
-            <!-- end betsDiv-->
-
+            <!-- end beting-->
+            <!-- user act -->
             <div id="acting" class="d-flex flex-wrap w-70 d-none">
               <div class="py-2">
                 <a
