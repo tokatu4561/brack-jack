@@ -11,8 +11,8 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
-    <!-- 
-    <link
+
+    <!-- <link
       href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
       rel="stylesheet"
     /> -->
@@ -34,7 +34,7 @@
     >
       <!-- login form div -->
       <div id="start-form">
-        <p class="text-white">Welcome to Black Jack!</p>
+        <p class="text-white text-center">Black Jack</p>
         <!-- name field div -->
         <div>
           <input id="user-name" value="" type="text" placeholder="name" />
@@ -48,7 +48,7 @@
       </div>
 
       <!-- all cards (dealer, players) div -->
-      <div id="game-table" class="col-12">
+      <div id="game-table" class="d-none col-12">
         <div class="pt-5">
           <p class="m-0 text-center text-white rem3">Dealer</p>
 
@@ -69,140 +69,7 @@
             id="action-and-betting-form"
             class="d-flex justify-content-center"
           >
-            <div id="betting" class="d-flex flex-column w-50">
-              <div class="py-2 d-flex justify-content-between">
-                <div>
-                  <button
-                    id="bet-5"
-                    data-bet="5"
-                    class="
-                      betting-item
-                      w-12
-                      h-12
-                      rounded-full
-                      shadow-lg
-                      bg-blue-400
-                      text-lg text-white
-                      font-semibold
-                      hover:bg-blue-500
-                      hover:shadow-sm
-                      hover:translate-y-0.5
-                      transform
-                      transition
-                    "
-                  >
-                    5
-                  </button>
-                </div>
-                <div>
-                  <button
-                    id="bet-20"
-                    data-bet="20"
-                    class="
-                      betting-item
-                      w-12
-                      h-12
-                      shadow-lg
-                      bg-red-400
-                      text-white
-                      rounded-full
-                      hover:bg-red-600
-                      hover:shadow-sm
-                      hover:translate-y-0.5
-                      transform
-                      transition
-                    "
-                  >
-                    20
-                  </button>
-                </div>
-                <div>
-                  <button
-                    id="bet-50"
-                    data-bet="50"
-                    class="
-                      betting-item
-                      w-12
-                      h-12
-                      bg-slate-600
-                      text-white
-                      rounded-full
-                      hover:translate-y-0.5
-                      hover:bg-slate-700
-                      transform
-                      transition
-                    "
-                  >
-                    50
-                  </button>
-                </div>
-                <div>
-                  <button
-                    id="bet-100"
-                    data-bet="100"
-                    class="
-                      betting-item
-                      w-12
-                      h-12
-                      bg-blue-300
-                      text-white
-                      rounded-full
-                      hover:bg-blue-400
-                      hover:shadow-sm
-                      hover:translate-y-0.5
-                      transform
-                      transition
-                    "
-                  >
-                    100
-                  </button>
-                </div>
-              </div>
-              <div class="bet-and-rest flex justify-around">
-                <button
-                  id="btn-reset"
-                  class="
-                    shadow-lg
-                    px-2
-                    py-1
-                    bg-blue-400
-                    text-lg text-white
-                    font-semibold
-                    rounded
-                    hover:bg-blue-500
-                    hover:shadow-sm
-                    hover:translate-y-0.5
-                    transform
-                    transition
-                  "
-                >
-                  リセット
-                </button>
-                <button
-                  type="button"
-                  id="bet-btn"
-                  class="
-                    shadow-lg
-                    px-2
-                    py-1
-                    bg-blue-400
-                    text-lg text-white
-                    font-semibold
-                    rounded
-                    hover:bg-blue-500
-                    hover:shadow-sm
-                    hover:translate-y-0.5
-                    transform
-                    transition
-                  "
-                >
-                  ベット
-                </button>
-              </div>
-              <p id="bet-total" class="text-white bg-blue-600 text-center">0</p>
-            </div>
-            <!-- end beting-->
-            <!-- user act -->
+            <!-- user act
             <div id="acting" class="d-flex flex-wrap w-70 d-none">
               <div class="py-2">
                 <a
@@ -236,30 +103,198 @@
                   >Double</a
                 >
               </div>
-            </div>
+            </div> -->
             <!-- end actionsDiv -->
           </div>
           <!-- end actionsAndBetsDiv-->
         </div>
 
-        <!-- round-over-->
-        <div id="round-over" class="d-flex flex-wrap w-70 d-none">
-          <button
-            id="next-game"
-            class="
-              bg-blue-500
-              hover:bg-blue-700
-              text-white
-              font-bold
-              py-2
-              px-4
-              rounded
-            "
-          >
-            続ける
-          </button>
-        </div>
+      </div>
+
+      <!-- round-over-->
+      <div id="round-over" class="d-none w-full p-4 absolute bottom-0 flex items-center bg-slate-900">
+        <button
+          id="next-game"
+          class="
+            bg-blue-500
+            hover:bg-blue-700
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded
+          "
+        >
+          続ける
+        </button>
+      </div>
+      <!-- end round-over-->
+
+      <div>
+        <p id="bet-total" class="text-white bg-blue-600 text-center">0</p>
+      </div>
+      <!-- user beting & acting-->
+      <div
+        id="betting"
+        class="d-none w-full p-4 absolute bottom-0 flex items-center bg-slate-900"
+      >
+        <div class="w-full flex justify-around">
+              <button
+              type="button"
+              id="bet-btn"
+              class="
+                shadow-lg
+                px-2
+                py-1
+                bg-blue-400
+                text-lg text-white
+                font-semibold
+                rounded
+                hover:bg-blue-500
+                hover:shadow-sm
+                hover:translate-y-0.5
+                transform
+                transition
+              "
+            >
+              ベット
+            </button>
+            <button
+                  id="bet-5"
+                  data-bet="5"
+                  class="
+                    betting-item
+                    w-12
+                    h-12
+                    rounded-full
+                    shadow-lg
+                    bg-blue-400
+                    text-lg text-white
+                    font-semibold
+                    hover:bg-blue-500
+                    hover:shadow-sm
+                    hover:translate-y-0.5
+                    transform
+                    transition
+                  "
+                >
+                  5
+                </button>
+                <button
+                  id="bet-20"
+                  data-bet="20"
+                  class="
+                    betting-item
+                    w-12
+                    h-12
+                    shadow-lg
+                    bg-red-400
+                    text-white
+                    rounded-full
+                    hover:bg-red-600
+                    hover:shadow-sm
+                    hover:translate-y-0.5
+                    transform
+                    transition
+                  "
+                >
+                  20
+                </button>
+                <button
+                  id="bet-50"
+                  data-bet="50"
+                  class="
+                    betting-item
+                    w-12
+                    h-12
+                    bg-slate-600
+                    text-white
+                    rounded-full
+                    hover:translate-y-0.5
+                    hover:bg-slate-700
+                    transform
+                    transition
+                  "
+                >
+                  50
+                </button>
+                <button
+                  id="bet-100"
+                  data-bet="100"
+                  class="
+                    betting-item
+                    w-12
+                    h-12
+                    bg-blue-300
+                    text-white
+                    rounded-full
+                    hover:bg-blue-400
+                    hover:shadow-sm
+                    hover:translate-y-0.5
+                    transform
+                    transition
+                  "
+                >
+                  100
+              </button>
+              <button
+              id="btn-reset"
+              class="
+                shadow-lg
+                px-2
+                py-1
+                bg-blue-400
+                text-lg text-white
+                font-semibold
+                rounded
+                hover:bg-blue-500
+                hover:shadow-sm
+                hover:translate-y-0.5
+                transform
+                transition
+              "
+            >
+              リセット
+            </button>
       </div>
     </div>
+    <!-- end beting-->
+
+    <!-- user acting -->
+      <div id="acting" class="d-none w-full p-4 absolute bottom-0 flex items-center bg-slate-900">
+        <div class="py-2">
+          <a
+            id="btn-surrender"
+            data-action="surrender"
+            class="text-dark btn btn-light px-5 py-1"
+            >Surrender</a
+          >
+        </div>
+        <div class="py-2">
+          <a
+            id="btn-stand"
+            data-action="stand"
+            class="btn btn-success px-5 py-1"
+            >Stand</a
+          >
+        </div>
+        <div class="py-2">
+          <a
+            id="btn-hit"
+            data-action="hit"
+            class="btn btn-warning px-5 py-1"
+            >Hit</a
+          >
+        </div>
+        <div class="py-2">
+          <a
+            id="btn-double"
+            data-action="double"
+            class="btn btn-danger px-5 py-1"
+            >Double</a
+          >
+        </div>
+      </div>
+      <!-- end acting -->
   </body>
 </html>
