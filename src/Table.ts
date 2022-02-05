@@ -149,7 +149,7 @@ export class Table {
         player.receivePrizeAmount();
       } else {
         // プレイヤーの状態がstandだった場合
-        player.isWin = false;
+        player.isWin = true;
         player.winAmount = player.bet;
         player.receivePrizeAmount();
       }
@@ -213,7 +213,7 @@ export class Table {
   }
 
   public dealerAction(): void {
-    while (this.house.getHandScore() < 18) {
+    while (this.house.getHandScore() < 15) {
       this.house.takeAction("hit");
       this.evaluateMove(this.house);
     }
