@@ -45,7 +45,7 @@ export class Table {
                 this.gamePhase = "roundOver";
                 return;
             case "roundOver":
-                this.evaluateGameResult();
+                this.evaluateGameWinners();
                 this.turnCounter = 0;
                 return;
         }
@@ -56,6 +56,7 @@ export class Table {
             case "surrender":
                 player.gameStatus = "surrender";
                 player.winAmount = -(player.bet / 2);
+                player.receivePrizeAmount();
                 break;
             case "stand":
                 player.gameStatus = "stand";
@@ -71,7 +72,8 @@ export class Table {
         }
         if (player.getHandScore() > 22) {
             player.gameStatus = "bust";
-            player.chips -= player.bet;
+            player.winAmount = -player.bet;
+            player.receivePrizeAmount();
         }
     }
     blackjackEvaluateAndGetRoundResults() {
@@ -87,21 +89,25 @@ export class Table {
             }
         }
     }
-    evaluateGameResult() {
+    evaluateGameWinners() {
         for (let player of this.players) {
-            if (player.gameStatus === "surrender")
+            if (player.gameStatus === "surrender") {
+                player.isWin = false;
                 continue;
+            }
             if (player.gameStatus === "bust") {
-                player.winAmount = -player.bet;
-                player.receivePrizeAmount();
+                player.isWin = false;
+                continue;
             }
             if (this.house.gameStatus == "bust" ||
                 (this.house.getHandScore() < player.getHandScore() &&
                     player.gameStatus == "double")) {
+                player.isWin = true;
                 player.winAmount = player.bet * 2;
                 player.receivePrizeAmount();
             }
             else {
+                player.isWin = false;
                 player.winAmount = player.bet;
                 player.receivePrizeAmount();
             }

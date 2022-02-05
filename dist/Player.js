@@ -8,6 +8,7 @@ export class Player {
         this.bet = 0;
         this.winAmount = 0;
         this.gameStatus = "stand";
+        this.isWin = false;
     }
     getHandScore() {
         let aceCount = 0;

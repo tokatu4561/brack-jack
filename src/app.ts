@@ -5,7 +5,7 @@ let table1;
 // const basePage = document.getElementById("gameDiv") as HTMLDivElement;
 const startPage = document.getElementById("start-form") as HTMLDivElement;
 const tablePage = document.getElementById("game-table") as HTMLDivElement;
-const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
+// const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
 const bettingForm = document.getElementById("betting") as HTMLDivElement;
 const actingForm = document.getElementById("acting") as HTMLDivElement;
 const playerList = document.getElementById("players") as HTMLDivElement;
@@ -33,21 +33,18 @@ startBtn.addEventListener("click", function () {
   table1 = new Table(userName);
   renderTable(table1);
 });
+
+// １ゲームが終わった後、ゲームオーバーでなければ次のゲームを開始する
 nextGameBtn.addEventListener("click", function () {
   table1.startNextGame();
   renderTable(table1);
 });
-// プレイヤーがベットした後、画面を切り替える
-betBtn.addEventListener("click", function () {
-  let total = parseInt(betTotal.textContent);
-  table1.getTurnPlayer().makeBet(total);
-  table1.changeTurn();
-  renderTable(table1);
-});
+
 // ベット額を0にする
 resetBetBtn.addEventListener("click", function () {
   betTotal.textContent = "0";
 });
+
 // ベット額の合計の表示を切り替える
 for (let i = 0; i < betAmountItems.length; i++) {
   betAmountItems[i].addEventListener("click", function () {
@@ -55,7 +52,16 @@ for (let i = 0; i < betAmountItems.length; i++) {
     betTotal.textContent = total.toString();
   });
 }
-// standやdobleなどユーザがアクションをとった後、画面の表示を切り替える
+
+// プレイヤーがベットした後、画面を切り替える
+betBtn.addEventListener("click", function () {
+  let total = parseInt(betTotal.textContent);
+  table1.getTurnPlayer().makeBet(total);
+  table1.changeTurn();
+  renderTable(table1);
+});
+
+// プレイしているユーザーのアクション　standやdobleなどユーザがアクションをとった後、画面の表示を切り替える
 surrenderBtn.addEventListener("click", function () {
   table1.getTurnPlayer().takeAction(this.dataset.action);
   table1.evaluateMove(table1.getTurnPlayer());
@@ -83,6 +89,7 @@ doubleBtn.addEventListener("click", function () {
   renderTable(table1);
 });
 
+//画面に描画するページーの表示・非表示切り替え関数
 function showPage(el: HTMLElement) {
   el.classList.remove("d-none");
 }
@@ -90,6 +97,7 @@ function hidePage(el: HTMLElement) {
   el.classList.remove("d-flex");
   el.classList.add("d-none");
 }
+
 // ベット額の合計を算出する
 function betSummation(
   inputElement: HTMLElement,
@@ -194,20 +202,25 @@ function roundOverController(table: Table): void {
     ${playerArea.innerHTML}
   `;
   }
-  printOutLogs(table.resultsLog);
+  //   printOutLogs(table.resultsLog);
 }
 
 function playerInfo(player: Player): HTMLDivElement {
   let container = document.createElement("div");
   let handArea = playerHands(player) as HTMLDivElement;
 
+  const gameResultContent = player.isWin
+    ? '<p class="m-0 text-white text-center rem3">WIN</p>'
+    : '<p class="m-0 text-white text-center rem3">LOSE</p>';
+  const gameResult = table1.gamePhase == "roundOver" ? gameResultContent : "";
+
   container.innerHTML = `
         <div id = "curPlayerDiv" class="flex-column w-50">
+            ${gameResult}
             <p class="m-0 text-white text-center rem3">${player.name}</p>
 
             <!-- playerInfo -->
             <div class="text-white pl-16 flex-col">
-                <p class="rem1 text-left">status:${player.gameStatus} </p>
                 <p class="rem1 text-left">bet:${player.bet} </p>
                 <p class="rem1 text-left">balance:${player.chips} </p>
             </div>
@@ -261,19 +274,19 @@ function renderDealerHands(player: Player): HTMLDivElement {
 }
 
 // ゲーム終了後結果のログを表示する
-function printOutLogs(logs: string[][]): void {
-  let container = document.createElement("div");
-  for (let i = 0; i < logs.length; i++) {
-    let round = document.createElement("div");
-    round.textContent = `round: ${i}`;
-    container.append(round);
+// function printOutLogs(logs: string[][]): void {
+//   let container = document.createElement("div");
+//   for (let i = 0; i < logs.length; i++) {
+//     let round = document.createElement("div");
+//     round.textContent = `round: ${i}`;
+//     container.append(round);
 
-    for (let log of logs[i]) {
-      let row = document.createElement("li");
-      row.innerHTML = `name:${log["name"]}, action: ${log["action"]}, bet:${log["bet"]}, won: ${log["won"]}`;
-      container.append(row);
-    }
-  }
+//     for (let log of logs[i]) {
+//       let row = document.createElement("li");
+//       row.innerHTML = `name:${log["name"]}, action: ${log["action"]}, bet:${log["bet"]}, won: ${log["won"]}`;
+//       container.append(row);
+//     }
+//   }
 
-  roundOverCon.append(container);
-}
+//   roundOverCon.append(container);
+// }

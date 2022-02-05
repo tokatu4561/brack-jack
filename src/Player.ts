@@ -8,9 +8,9 @@ export class Player {
   public gameStatus: string;
   public bet: number;
   public winAmount: number;
+  public isWin: boolean;
 
   constructor(name: string, type: string, chips: number = 400) {
-    // プレイヤーの手札
     this.name = name;
     this.hand = [];
     this.type = type;
@@ -18,6 +18,7 @@ export class Player {
     this.bet = 0;
     this.winAmount = 0;
     this.gameStatus = "stand";
+    this.isWin = false;
   }
 
   /*

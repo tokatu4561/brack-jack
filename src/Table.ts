@@ -129,17 +129,27 @@ export class Table {
   //   プレイヤーとハウスの結果を評価し、勝者は残金、ベットの状態を更新する
   private evaluateGameWinners() {
     for (let player of this.players) {
-      if (player.gameStatus === "surrender") continue;
-      if (player.gameStatus === "bust") continue;
+      if (player.gameStatus === "surrender") {
+        player.isWin = false;
+        continue;
+      }
+      if (player.gameStatus === "bust") {
+        player.isWin = false;
+        continue;
+      }
+
+      //以下はゲームに勝利した場合
       if (
         this.house.gameStatus == "bust" ||
         (this.house.getHandScore() < player.getHandScore() &&
           player.gameStatus == "double")
       ) {
+        player.isWin = true;
         player.winAmount = player.bet * 2;
         player.receivePrizeAmount();
       } else {
         // プレイヤーの状態がstandだった場合
+        player.isWin = false;
         player.winAmount = player.bet;
         player.receivePrizeAmount();
       }
