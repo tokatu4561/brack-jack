@@ -32,6 +32,7 @@
       id="gameDiv"
       class="bg-green d-flex justify-content-center align-items-center vh-100"
     >
+      <div id="game-log" class="absolute top-8 right-8 h-24 heitext-white bg-blue-600 text-center overflow-scroll"></div>
       <!-- login form div -->
       <div id="start-form">
         <p class="text-white text-center">Black Jack</p>
@@ -50,9 +51,7 @@
       <!-- all cards (dealer, players) div -->
       <div id="game-table" class="d-none col-12">
         <div class="pt-5">
-          <p class="m-0 text-center text-white rem3">Dealer</p>
-
-          <!-- House Card Row -->
+          <p class="m-0 text-center text-white">Dealer</p>
           <div
             id="dealer-hand"
             class="d-flex justify-content-center pt-3 pb-5"
@@ -64,52 +63,9 @@
           <div id="players" class="d-flex justify-content-center"></div>
           <!-- end players -->
 
-          <!-- action-and-betting-->
-          <div
-            id="action-and-betting-form"
-            class="d-flex justify-content-center"
-          >
-            <!-- user act
-            <div id="acting" class="d-flex flex-wrap w-70 d-none">
-              <div class="py-2">
-                <a
-                  id="btn-surrender"
-                  data-action="surrender"
-                  class="text-dark btn btn-light px-5 py-1"
-                  >Surrender</a
-                >
-              </div>
-              <div class="py-2">
-                <a
-                  id="btn-stand"
-                  data-action="stand"
-                  class="btn btn-success px-5 py-1"
-                  >Stand</a
-                >
-              </div>
-              <div class="py-2">
-                <a
-                  id="btn-hit"
-                  data-action="hit"
-                  class="btn btn-warning px-5 py-1"
-                  >Hit</a
-                >
-              </div>
-              <div class="py-2">
-                <a
-                  id="btn-double"
-                  data-action="double"
-                  class="btn btn-danger px-5 py-1"
-                  >Double</a
-                >
-              </div>
-            </div> -->
-            <!-- end actionsDiv -->
-          </div>
-          <!-- end actionsAndBetsDiv-->
         </div>
-
       </div>
+      <!-- end game-table -->
 
       <!-- round-over-->
       <div id="round-over" class="d-none w-full p-4 absolute bottom-0 flex items-center bg-slate-900">
@@ -130,8 +86,8 @@
       </div>
       <!-- end round-over-->
 
-      <div>
-        <p id="bet-total" class="text-white bg-blue-600 text-center">0</p>
+      <div class="absolute top-8 left-8 text-white bg-blue-600 text-center">
+        <p id="bet-total" class="text-white w-16 bg-blue-600 text-center">0</p>
       </div>
       <!-- user beting & acting-->
       <div

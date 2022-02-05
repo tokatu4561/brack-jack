@@ -2,10 +2,12 @@ import { Table } from "./Table.js";
 import { Player } from "./Player.js";
 
 let table1;
+
 // const basePage = document.getElementById("gameDiv") as HTMLDivElement;
 const startPage = document.getElementById("start-form") as HTMLDivElement;
 const tablePage = document.getElementById("game-table") as HTMLDivElement;
-// const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
+const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
+const gameRogCon = document.getElementById("game-log") as HTMLDivElement;
 const bettingForm = document.getElementById("betting") as HTMLDivElement;
 const actingForm = document.getElementById("acting") as HTMLDivElement;
 const playerList = document.getElementById("players") as HTMLDivElement;
@@ -160,51 +162,42 @@ function waitingController(table1: Table): void {
   }
 }
 
-function actingController(table1: Table): void {
+function actingController(table: Table): void {
   hidePage(bettingForm);
   showPage(actingForm);
 
   dealerCon.innerHTML = "";
-  dealerCon.append(renderDealerHands(table1.house));
-  playerList.innerHTML = ``;
-  for (let player of table1.players) {
-    let playerArea = playerInfo(player);
-
-    playerList.innerHTML += `
-    ${playerArea.innerHTML}
-  `;
-  }
+  dealerCon.append(renderDealerHands(table.house));
+  renderPlayersInfo(table.players);
 }
 
-function bettingController(table1: Table): void {
+function bettingController(table: Table): void {
   hidePage(actingForm);
   showPage(bettingForm);
 
   dealerCon.innerHTML = "";
-  dealerCon.append(renderDealerHands(table1.house));
-  playerList.innerHTML = ``;
-  for (let player of table1.players) {
-    let playerArea = playerInfo(player);
-
-    playerList.innerHTML += `
-    ${playerArea.innerHTML}
-  `;
-  }
+  dealerCon.append(renderDealerHands(table.house));
+  renderPlayersInfo(table.players);
 }
 
 function roundOverController(table: Table): void {
+  showPage(roundOverCon);
   dealerCon.append(renderDealerHands(table.house));
+  renderPlayersInfo(table.players);
+  printOutLogs(table.resultsLog);
+}
+
+//　各プレイヤーの情報を画面に表示する
+function renderPlayersInfo(players: Player[]) {
   playerList.innerHTML = ``;
-  for (let player of table.players) {
+  for (let player of players) {
     let playerArea = playerInfo(player);
 
     playerList.innerHTML += `
     ${playerArea.innerHTML}
   `;
   }
-  //   printOutLogs(table.resultsLog);
 }
-
 function playerInfo(player: Player): HTMLDivElement {
   let container = document.createElement("div");
   let handArea = playerHands(player) as HTMLDivElement;
@@ -273,20 +266,21 @@ function renderDealerHands(player: Player): HTMLDivElement {
   return container;
 }
 
-// ゲーム終了後結果のログを表示する
-// function printOutLogs(logs: string[][]): void {
-//   let container = document.createElement("div");
-//   for (let i = 0; i < logs.length; i++) {
-//     let round = document.createElement("div");
-//     round.textContent = `round: ${i}`;
-//     container.append(round);
+// ゲーム結果のログを表示する;
+function printOutLogs(logs: string[][]): void {
+  let container = document.createElement("div");
+  for (let i = 0; i < logs.length; i++) {
+    let round = document.createElement("div");
+    round.textContent = `round: ${i}`;
+    container.append(round);
 
-//     for (let log of logs[i]) {
-//       let row = document.createElement("li");
-//       row.innerHTML = `name:${log["name"]}, action: ${log["action"]}, bet:${log["bet"]}, won: ${log["won"]}`;
-//       container.append(row);
-//     }
-//   }
+    for (let log of logs[i]) {
+      let row = document.createElement("li");
+      row.innerHTML = `${log["name"]}, 獲得:${log["won"]}`;
+      container.append(row);
+    }
+  }
 
-//   roundOverCon.append(container);
-// }
+  gameRogCon.innerHTML = "";
+  gameRogCon.append(container);
+}
