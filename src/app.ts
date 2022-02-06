@@ -39,6 +39,7 @@ startBtn.addEventListener("click", function () {
 // １ゲームが終わった後、ゲームオーバーでなければ次のゲームを開始する
 nextGameBtn.addEventListener("click", function () {
   table1.startNextGame();
+  hidePage(roundOverCon);
   renderTable(table1);
 });
 
@@ -268,10 +269,12 @@ function renderDealerHands(player: Player): HTMLDivElement {
 
 // ゲーム結果のログを表示する;
 function printOutLogs(logs: string[][]): void {
-  let container = document.createElement("div");
+  let container = document.createElement("ul");
+  container.classList.add("list-none");
+
   for (let i = 0; i < logs.length; i++) {
     let round = document.createElement("div");
-    round.textContent = `round: ${i}`;
+    round.textContent = `round: ${i + 1}`;
     container.append(round);
 
     for (let log of logs[i]) {

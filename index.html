@@ -32,17 +32,20 @@
       id="gameDiv"
       class="bg-green d-flex justify-content-center align-items-center vh-100"
     >
-      <div id="game-log" class="absolute top-8 right-8 h-24 heitext-white bg-blue-600 text-center overflow-scroll"></div>
-      <!-- login form div -->
+     <!-- game-log -->
+     <div class="absolute top-8 right-8 h-24 p-4 text-white bg-slate-900 rounded-lg overflow-scroll">
+       <p class="text-center">ゲームログ</p>
+       <div id="game-log" class="text-left"></div>
+     </div>
+
+      <!-- user-name form  -->
       <div id="start-form">
-        <p class="text-white text-center">Black Jack</p>
-        <!-- name field div -->
-        <div>
-          <input id="user-name" value="" type="text" placeholder="name" />
+        <p class="text-white text-center mb-4">Black Jack</p>
+        <div class="mb-4">
+          <input id="user-name" value="" type="text" placeholder="name" class="rounded-lg p-2" />
         </div>
-        <!-- submit div -->
-        <div>
-          <button id="game-start" class="btn btn-success">
+        <div class="text-center">
+          <button id="game-start" class="text-white font-bold py-2 px-4 bg-slate-400 hover:bg-slate-600 rounded-lg">
             ゲームを開始する
           </button>
         </div>
@@ -86,8 +89,9 @@
       </div>
       <!-- end round-over-->
 
-      <div class="absolute top-8 left-8 text-white bg-blue-600 text-center">
-        <p id="bet-total" class="text-white w-16 bg-blue-600 text-center">0</p>
+      <div class="absolute py-4 top-8 left-8 w-16 rounded-lg text-white bg-slate-900 text-center">
+        <p>Bet</p>
+        <p id="bet-total" class="">0</p>
       </div>
       <!-- user beting & acting-->
       <div
@@ -217,7 +221,7 @@
     <!-- end beting-->
 
     <!-- user acting -->
-      <div id="acting" class="d-none w-full p-4 absolute bottom-0 flex items-center bg-slate-900">
+      <div id="acting" class="d-none w-full p-4 absolute bottom-0 flex justify-around items-center bg-slate-900">
         <div class="py-2">
           <a
             id="btn-surrender"
