@@ -5,7 +5,7 @@ export class Table {
   public players: Player[];
   public house: Player;
   private deck: Deck;
-  public gamePhase: string = "betting"; //{'betting', 'acting', 'evaluatingWinners','roundOver'} から選択
+  public gamePhase: string = "betting"; //{'betting', 'acting', 'evaluatingWinners','roundOver', 'gameOver'} から選択
   private betDenominations: number[];
   private turnCounter: number;
   public resultsLog: string[][];
@@ -64,6 +64,9 @@ export class Table {
       case "roundOver":
         this.evaluateGameWinners();
         this.turnCounter = 0;
+        if (this.isGameOver()) {
+          this.gamePhase = "gameOver";
+        }
         return;
     }
 
@@ -113,10 +116,7 @@ export class Table {
     // ゲームオーバーのプレイヤーがいれば終了
   }
 
-  /*
-   * デッキから2枚のカードを手札に加えることで、全プレイヤーの状態を更新します。
-   * NOTE: プレイヤーのタイプが「ハウス」の場合は、別の処理を行う必要があります。
-   */
+  // デッキから2枚のカードを手札に加えることで、全プレイヤーの状態を更新。
   private blackjackAssignPlayerHands(): void {
     for (let player of this.players) {
       for (let i = 1; i <= 2; i++) {
@@ -127,7 +127,7 @@ export class Table {
   }
 
   //   プレイヤーとハウスの結果を評価し、勝者は残金、ベットの状態を更新する
-  private evaluateGameWinners() {
+  private evaluateGameWinners(): void {
     for (let player of this.players) {
       if (player.gameStatus === "surrender") {
         player.isWin = false;
@@ -225,5 +225,15 @@ export class Table {
     this.gamePhase = "betting";
     this.house.hand = [];
     this.house.getCard(this.deck.drawOne());
+  }
+
+  private isGameOver(): boolean {
+    for (let player of this.players) {
+      if (player.chips <= 0) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

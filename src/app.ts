@@ -3,16 +3,19 @@ import { Player } from "./Player.js";
 
 let table1;
 
-// const basePage = document.getElementById("gameDiv") as HTMLDivElement;
+//　表示するコンテンツ
 const startPage = document.getElementById("start-form") as HTMLDivElement;
 const tablePage = document.getElementById("game-table") as HTMLDivElement;
 const roundOverCon = document.getElementById("round-over") as HTMLDivElement;
+const gameOverCon = document.getElementById("game-over") as HTMLDivElement;
 const gameRogCon = document.getElementById("game-log") as HTMLDivElement;
 const bettingForm = document.getElementById("betting") as HTMLDivElement;
 const actingForm = document.getElementById("acting") as HTMLDivElement;
 const playerList = document.getElementById("players") as HTMLDivElement;
 const dealerCon = document.getElementById("dealer-hand") as HTMLDivElement;
 const userNameInput = document.getElementById("user-name") as HTMLInputElement;
+
+// Bet & Action ボタン
 const startBtn = document.getElementById("game-start") as HTMLButtonElement;
 const nextGameBtn = document.getElementById("next-game") as HTMLButtonElement;
 const betBtn = document.getElementById("bet-btn") as HTMLButtonElement;
@@ -21,10 +24,11 @@ const surrenderBtn = document.getElementById("btn-surrender") as HTMLElement;
 const standBtn = document.getElementById("btn-stand") as HTMLElement;
 const hitBtn = document.getElementById("btn-hit") as HTMLElement;
 const doubleBtn = document.getElementById("btn-double") as HTMLElement;
-const betAmountItems = document.querySelectorAll(
+const betAmountBtns = document.querySelectorAll(
   ".betting-item"
-) as NodeListOf<HTMLElement>;
+) as NodeListOf<HTMLButtonElement>;
 const betTotal = document.getElementById("bet-total") as HTMLElement;
+const userBalance = document.getElementById("user-balance") as HTMLElement;
 
 // 初期表示画面でユーザーの名前の入力を受け取り、ゲームを開始する(最初のゲームテーブルを表示させる)
 startBtn.addEventListener("click", function () {
@@ -46,12 +50,14 @@ nextGameBtn.addEventListener("click", function () {
 // ベット額を0にする
 resetBetBtn.addEventListener("click", function () {
   betTotal.textContent = "0";
+  changeBetBtnStateClickable();
 });
 
 // ベット額の合計の表示を切り替える
-for (let i = 0; i < betAmountItems.length; i++) {
-  betAmountItems[i].addEventListener("click", function () {
-    let total = betSummation(betAmountItems[i], "data-bet");
+for (let i = 0; i < betAmountBtns.length; i++) {
+  betAmountBtns[i].addEventListener("click", function () {
+    let total = betSummation(betAmountBtns[i], "data-bet");
+    changeBetBtnStateClickable();
     betTotal.textContent = total.toString();
   });
 }
@@ -118,32 +124,52 @@ function betSummation(
 
   return total;
 }
+//　ベットと残高の状態からベットするボタンの状態を切り替える
+function changeBetBtnStateClickable(): void {
+  for (let i = 0; i < betAmountBtns.length; i++) {
+    const isClickAble =
+      Number(betTotal.textContent) + Number(betAmountBtns[i].dataset.bet) <
+      Number(userBalance.textContent);
 
-// テーブルの状態を表示させる
+    if (isClickAble) {
+      betAmountBtns[i].removeAttribute("disabled");
+      betAmountBtns[i].classList.remove("opacity-50");
+    } else {
+      betAmountBtns[i].classList.add("opacity-50");
+      betAmountBtns[i].setAttribute("disabled", "");
+    }
+  }
+}
+
+// 現在テーブルの状態を表示させる
 function renderTable(table: Table): void {
+  if (table.gamePhase == "roundOver") {
+    table.changeTurn();
+    roundOverController(table);
+    return;
+  }
+
   if (table.getTurnPlayer().type == "user") {
     switch (table.gamePhase) {
       case "betting":
         bettingController(table);
-        break;
+        return;
       case "acting":
         actingController(table);
-        break;
+        return;
     }
-  } else {
-    if (table.gamePhase == "roundOver") {
-      roundOverController(table);
-      table.changeTurn();
-      return;
-    }
-    waitingController(table);
-    setTimeout(function () {
-      table.changeTurn();
-      renderTable(table);
-    }, 2000);
   }
+
+  waitingController(table);
+  setTimeout(function () {
+    table.changeTurn();
+    renderTable(table);
+  }, 2000);
 }
 
+/*
+ * Controller 画面の表示を制御する
+ */
 function waitingController(table1: Table): void {
   hidePage(startPage);
   hidePage(bettingForm);
@@ -182,9 +208,19 @@ function bettingController(table: Table): void {
 }
 
 function roundOverController(table: Table): void {
-  showPage(roundOverCon);
+  if (table.gamePhase == "gameOver") {
+    gameOverController(table);
+    return;
+  }
+
   dealerCon.append(renderDealerHands(table.house));
   renderPlayersInfo(table.players);
+  showPage(roundOverCon);
+  printOutLogs(table.resultsLog);
+}
+
+function gameOverController(table: Table): void {
+  showPage(gameOverCon);
   printOutLogs(table.resultsLog);
 }
 
@@ -192,6 +228,10 @@ function roundOverController(table: Table): void {
 function renderPlayersInfo(players: Player[]) {
   playerList.innerHTML = ``;
   for (let player of players) {
+    if (player.type == "user") {
+      userBalance.innerHTML = player.chips.toString();
+    }
+
     let playerArea = playerInfo(player);
 
     playerList.innerHTML += `
@@ -211,7 +251,7 @@ function playerInfo(player: Player): HTMLDivElement {
   container.innerHTML = `
         <div id = "curPlayerDiv" class="flex-column w-50">
             ${gameResult}
-            <p class="m-0 text-white text-center rem3">${player.name}</p>
+            <p class="m-0 text-white text-center text-5xl">${player.name}</p>
 
             <!-- playerInfo -->
             <div class="text-white pl-16 flex-col">
@@ -229,7 +269,7 @@ function playerInfo(player: Player): HTMLDivElement {
 function playerHands(player: Player): HTMLDivElement {
   const container = document.createElement("div") as HTMLDivElement;
   const handArea = document.createElement("div") as HTMLDivElement;
-  handArea.setAttribute("class", "d-flex justify-content-center");
+  handArea.setAttribute("class", "flex justify-content-center");
 
   handArea.innerHTML = "";
   for (let i = 0; i < player.hand.length; i++) {
