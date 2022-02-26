@@ -1,23 +1,23 @@
 import { User } from "./User.js";
 
-export class Player extends User {
+export class Bot extends User {
   public chips: number = 400;
-  public bet: number;
+  public bet: number = 0;
   public winAmount: number;
   public isWin: boolean;
 
-  constructor(name: string, chips: number = 400) {
+  constructor() {
     super();
-    this.name = name;
+    this.name = "Bot";
     this.hand = [];
-    this.chips = chips;
-    this.bet = 0;
-    this.winAmount = 0;
     this.gameStatus = "stand";
     this.isWin = false;
   }
 
   public makeBet(bet: number): number {
+    if (bet > this.chips) {
+      bet = this.chips;
+    }
     this.bet = bet;
     return this.bet;
   }
@@ -28,5 +28,11 @@ export class Player extends User {
 
   public takeAction(action: string) {
     this.gameStatus = action;
+
+    const handScore = this.getHandScore();
+
+    if (handScore < 14) {
+      this.gameStatus = "double";
+    }
   }
 }
