@@ -1,5 +1,7 @@
 import { Table } from "./Table.js";
 import { Player } from "./Player.js";
+import { Host } from "./Host.js";
+import { Bot } from "./Bot.js";
 
 let table1;
 
@@ -20,10 +22,9 @@ const startBtn = document.getElementById("game-start") as HTMLButtonElement;
 const nextGameBtn = document.getElementById("next-game") as HTMLButtonElement;
 const betBtn = document.getElementById("bet-btn") as HTMLButtonElement;
 const resetBetBtn = document.getElementById("btn-reset") as HTMLButtonElement;
-const surrenderBtn = document.getElementById("btn-surrender") as HTMLElement;
-const standBtn = document.getElementById("btn-stand") as HTMLElement;
-const hitBtn = document.getElementById("btn-hit") as HTMLElement;
-const doubleBtn = document.getElementById("btn-double") as HTMLElement;
+const actionBtns = document.querySelectorAll(
+  ".btn-action"
+) as NodeListOf<HTMLButtonElement>;
 const betAmountBtns = document.querySelectorAll(
   ".betting-item"
 ) as NodeListOf<HTMLButtonElement>;
@@ -71,32 +72,23 @@ betBtn.addEventListener("click", function () {
 });
 
 // プレイしているユーザーのアクション　standやdobleなどユーザがアクションをとった後、画面の表示を切り替える
-surrenderBtn.addEventListener("click", function () {
-  table1.getTurnPlayer().takeAction(this.dataset.action);
-  table1.evaluateMove(table1.getTurnPlayer());
-  table1.changeTurn();
-  renderTable(table1);
-});
-standBtn.addEventListener("click", function () {
-  table1.getTurnPlayer().takeAction(this.dataset.action);
-  table1.evaluateMove(table1.getTurnPlayer());
-  table1.changeTurn();
-  renderTable(table1);
-});
-hitBtn.addEventListener("click", function () {
-  table1.getTurnPlayer().takeAction(this.dataset.action);
-  table1.evaluateMove(table1.getTurnPlayer());
-  if (table1.getTurnPlayer().gameStatus === "bust") {
+for (let i = 0; i < actionBtns.length; i++) {
+  actionBtns[i].addEventListener("click", function () {
+    table1.getTurnPlayer().takeAction(this.dataset.action);
+    table1.evaluateMove(table1.getTurnPlayer());
+
+    if (
+      this.dataset.action == "hit" &&
+      table1.getTurnPlayer().gameStatus !== "bust"
+    ) {
+      renderTable(table1);
+      return;
+    }
+
     table1.changeTurn();
-  }
-  renderTable(table1);
-});
-doubleBtn.addEventListener("click", function () {
-  table1.getTurnPlayer().takeAction(this.dataset.action);
-  table1.evaluateMove(table1.getTurnPlayer());
-  table1.changeTurn();
-  renderTable(table1);
-});
+    renderTable(table1);
+  });
+}
 
 //画面に描画するページーの表示・非表示切り替え関数
 function showPage(el: HTMLElement) {
@@ -124,6 +116,7 @@ function betSummation(
 
   return total;
 }
+
 //　ベットと残高の状態からベットするボタンの状態を切り替える
 function changeBetBtnStateClickable(): void {
   for (let i = 0; i < betAmountBtns.length; i++) {
@@ -149,7 +142,7 @@ function renderTable(table: Table): void {
     return;
   }
 
-  if (table.getTurnPlayer().type == "user") {
+  if (table.getTurnPlayer() instanceof Player) {
     switch (table.gamePhase) {
       case "betting":
         bettingController(table);
@@ -208,13 +201,14 @@ function bettingController(table: Table): void {
 }
 
 function roundOverController(table: Table): void {
+  dealerCon.innerHTML = "";
+  dealerCon.append(renderDealerHands(table.house));
+  renderPlayersInfo(table.players);
   if (table.gamePhase == "gameOver") {
     gameOverController(table);
     return;
   }
 
-  dealerCon.append(renderDealerHands(table.house));
-  renderPlayersInfo(table.players);
   showPage(roundOverCon);
   printOutLogs(table.resultsLog);
 }
@@ -228,7 +222,7 @@ function gameOverController(table: Table): void {
 function renderPlayersInfo(players: Player[]) {
   playerList.innerHTML = ``;
   for (let player of players) {
-    if (player.type == "user") {
+    if (player instanceof Player) {
       userBalance.innerHTML = player.chips.toString();
     }
 
@@ -244,8 +238,8 @@ function playerInfo(player: Player): HTMLDivElement {
   let handArea = playerHands(player) as HTMLDivElement;
 
   const gameResultContent = player.isWin
-    ? '<p class="m-0 text-white text-center rem3">WIN</p>'
-    : '<p class="m-0 text-white text-center rem3">LOSE</p>';
+    ? '<p class="m-0 text-orange-500 text-center text-5xl">WIN</p>'
+    : '<p class="m-0 text-blue-800 text-center text-5xl">LOSE</p>';
   const gameResult = table1.gamePhase == "roundOver" ? gameResultContent : "";
 
   container.innerHTML = `
@@ -256,7 +250,7 @@ function playerInfo(player: Player): HTMLDivElement {
             <!-- playerInfo -->
             <div class="text-white pl-16 flex-col">
                 <p class="rem1 text-left">bet:${player.bet} </p>
-                <p class="rem1 text-left">balance:${player.chips} </p>
+                <p class="rem1 text-left">残金:${player.chips} </p>
             </div>
             
             ${handArea.innerHTML}
@@ -266,7 +260,7 @@ function playerInfo(player: Player): HTMLDivElement {
 }
 
 //　プレイヤーが持っているカードについて表示させる内容
-function playerHands(player: Player): HTMLDivElement {
+function playerHands(player: Player | Host | Bot): HTMLDivElement {
   const container = document.createElement("div") as HTMLDivElement;
   const handArea = document.createElement("div") as HTMLDivElement;
   handArea.setAttribute("class", "flex justify-content-center");
@@ -284,7 +278,7 @@ function playerHands(player: Player): HTMLDivElement {
     let cardImagePath = suitsImagePath[cardSuit];
 
     handArea.innerHTML += `
-    <div class="bg-white border mx-2">
+    <div class="bg-white p-2 rounded border mx-2">
         <div class="text-center">
             <img src="${cardImagePath}" alt="" width="50" height="50">
         </div>
@@ -299,7 +293,8 @@ function playerHands(player: Player): HTMLDivElement {
   return container;
 }
 
-function renderDealerHands(player: Player): HTMLDivElement {
+//ディーラーの手札を表示させる
+function renderDealerHands(player: Host): HTMLDivElement {
   let container = document.createElement("div");
   let handArea = playerHands(player) as HTMLDivElement;
 
