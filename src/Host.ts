@@ -4,7 +4,6 @@ export class Host extends User {
   constructor() {
     super();
     this.name = "Host";
-    this.hand = [];
     this.gameStatus = "stand";
   }
 

@@ -18,7 +18,7 @@ export abstract class User {
 
     if (totalScore <= 21) return totalScore;
 
-    while (totalScore > 21 && aceCount != 0) {
+    while (totalScore > 21 && aceCount > 0) {
       totalScore -= 10;
       aceCount--;
     }
