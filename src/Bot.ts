@@ -3,7 +3,7 @@ import { User } from "./User.js";
 export class Bot extends User {
   public chips: number = 400;
   public bet: number = 0;
-  public winAmount: number;
+  public winAmount: number = 0;
   public isWin: boolean;
 
   constructor() {
@@ -31,8 +31,12 @@ export class Bot extends User {
 
     const handScore = this.getHandScore();
 
-    if (handScore < 14) {
+    if (handScore < 12) {
       this.gameStatus = "double";
+    }
+
+    if (handScore < 14) {
+      this.gameStatus = "hit";
     }
   }
 }
