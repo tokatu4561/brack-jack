@@ -157,7 +157,7 @@ function renderTable(table: Table): void {
   setTimeout(function () {
     table.changeTurn();
     renderTable(table);
-  }, 2000);
+  }, 1500);
 }
 
 /*
