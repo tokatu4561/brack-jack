@@ -1,48 +1,25 @@
-export class Player {
-    constructor(name, type, chips = 400) {
+import { User } from "./User.js";
+export class Player extends User {
+    constructor(name, chips = 400) {
+        super();
         this.chips = 400;
         this.name = name;
         this.hand = [];
-        this.type = type;
         this.chips = chips;
         this.bet = 0;
         this.winAmount = 0;
         this.gameStatus = "stand";
         this.isWin = false;
     }
-    getHandScore() {
-        let aceCount = 0;
-        let totalScore = this.hand.reduce(function (sum, card) {
-            if (card.rank === "A")
-                aceCount++;
-            return sum + card.getRankNumber();
-        }, 0);
-        if (totalScore <= 21)
-            return totalScore;
-        while (totalScore > 21 && aceCount != 0) {
-            totalScore -= 10;
-            aceCount--;
-        }
-        return totalScore;
-    }
-    getCard(card) {
-        if (card === undefined)
-            return;
-        this.hand.push(card);
-    }
     makeBet(bet) {
         this.bet = bet;
         return this.bet;
     }
-    takeAction(action) {
-        this.gameStatus = action;
-    }
-    resetBetWithHand() {
-        this.hand = [];
-        this.bet = 0;
-    }
     receivePrizeAmount() {
         this.chips += this.winAmount;
+    }
+    takeAction(action) {
+        this.gameStatus = action;
     }
 }
 //# sourceMappingURL=Player.js.map

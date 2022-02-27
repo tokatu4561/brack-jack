@@ -1,27 +1,26 @@
+import { Bot } from "./Bot.js";
 import { Deck } from "./Deck.js";
+import { Host } from "./Host.js";
 import { Player } from "./Player.js";
 export class Table {
     constructor(userName = "you", betDenominations = [5, 20, 50, 100]) {
         this.gamePhase = "betting";
         this.betDenominations = betDenominations;
         this.deck = new Deck();
-        this.players = [
-            new Player("player1", "ai"),
-            new Player(userName, "user"),
-            new Player("player3", "ai"),
-        ];
-        this.house = new Player("house", "house");
+        this.players = [new Bot(), new Player(userName), new Bot()];
+        this.house = new Host();
         this.gamePhase = "betting";
         this.turnCounter = 0;
         this.resultsLog = [];
         this.house.getCard(this.deck.drawOne());
-        this.blackjackAssignPlayerHands();
+        this.assignPlayerHands();
     }
     changeTurn() {
         switch (this.gamePhase) {
             case "betting":
-                if (this.getTurnPlayer().type == "ai") {
-                    this.getTurnPlayer().makeBet(this.betDenominations[2]);
+                if (this.getTurnPlayer() instanceof Bot) {
+                    const randomNum = Math.floor(Math.random() * 4);
+                    this.getTurnPlayer().makeBet(this.betDenominations[randomNum]);
                 }
                 if (this.onLastPlayer()) {
                     this.gamePhase = "acting";
@@ -30,58 +29,72 @@ export class Table {
                 }
                 break;
             case "acting":
-                if (this.getTurnPlayer().type == "ai") {
-                    this.getTurnPlayer().takeAction("surrender");
+                if (this.getTurnPlayer() instanceof Bot) {
+                    this.getTurnPlayer().takeAction("stand");
                     this.evaluateMove(this.getTurnPlayer());
                 }
-                if (this.onLastPlayer() && this.allPlayerActionsResolved()) {
+                if (!this.playerActionsResolved(this.getTurnPlayer())) {
+                    return;
+                }
+                if (this.onLastPlayer()) {
                     this.gamePhase = "evaluatingWinners";
                     return;
                 }
                 break;
             case "evaluatingWinners":
-                this.dealerAction();
-                this.addResultLogs();
+                this.house.takeAction("stand");
+                this.evaluateMoveOfHouse(this.house);
+                if (!this.playerActionsResolved(this.house)) {
+                    return;
+                }
                 this.gamePhase = "roundOver";
                 return;
             case "roundOver":
                 this.evaluateGameWinners();
+                this.addResultLogs();
                 this.turnCounter = 0;
+                if (this.isGameOver()) {
+                    this.gamePhase = "gameOver";
+                }
                 return;
         }
         this.turnCounter++;
     }
-    evaluateMove(player) {
-        switch (player.gameStatus) {
+    evaluateMove(user) {
+        switch (user.gameStatus) {
             case "surrender":
-                player.gameStatus = "surrender";
-                player.winAmount = -(player.bet / 2);
-                player.receivePrizeAmount();
+                user.winAmount = -(user.bet / 2);
+                user.receivePrizeAmount();
                 break;
             case "stand":
-                player.gameStatus = "stand";
                 break;
             case "hit":
-                player.gameStatus = "hit";
-                player.getCard(this.deck.drawOne());
+                user.getCard(this.deck.drawOne());
                 break;
             case "double":
-                player.gameStatus = "double";
-                player.getCard(this.deck.drawOne());
-                player.makeBet(player.bet * 2);
+                user.getCard(this.deck.drawOne());
+                user.makeBet(user.bet * 2);
+                break;
         }
-        if (player.getHandScore() > 22) {
-            player.gameStatus = "bust";
-            player.winAmount = -player.bet;
-            player.receivePrizeAmount();
-        }
-    }
-    blackjackEvaluateAndGetRoundResults() {
-        if (this.onLastPlayer()) {
-            this.allPlayerActionsResolved();
+        if (user.getHandScore() > 22) {
+            user.gameStatus = "bust";
+            user.winAmount = -user.bet;
+            user.receivePrizeAmount();
         }
     }
-    blackjackAssignPlayerHands() {
+    evaluateMoveOfHouse(user) {
+        switch (user.gameStatus) {
+            case "stand":
+                break;
+            case "hit":
+                user.getCard(this.deck.drawOne());
+                break;
+        }
+        if (user.getHandScore() > 22) {
+            user.gameStatus = "bust";
+        }
+    }
+    assignPlayerHands() {
         for (let player of this.players) {
             for (let i = 1; i <= 2; i++) {
                 let dealedCard = this.deck.drawOne();
@@ -99,23 +112,27 @@ export class Table {
                 player.isWin = false;
                 continue;
             }
-            if (this.house.gameStatus == "bust" ||
-                (this.house.getHandScore() < player.getHandScore() &&
-                    player.gameStatus == "double")) {
+            if (this.house.gameStatus == "bust") {
                 player.isWin = true;
-                player.winAmount = player.bet * 2;
+                player.winAmount = player.bet;
+                player.receivePrizeAmount();
+            }
+            if ((player.gameStatus == "double" || player.gameStatus == "stand") &&
+                this.house.getHandScore() < player.getHandScore()) {
+                player.isWin = true;
+                player.winAmount = player.bet;
                 player.receivePrizeAmount();
             }
             else {
                 player.isWin = false;
-                player.winAmount = player.bet;
+                player.winAmount = -player.bet;
                 player.receivePrizeAmount();
             }
         }
     }
-    blackjackClearPlayerHandsAndBets() {
+    clearPlayerHandsAndBets() {
         for (let player of this.players) {
-            player.resetBetWithHand();
+            player.resetState();
         }
     }
     getTurnPlayer() {
@@ -126,18 +143,16 @@ export class Table {
             return true;
         return false;
     }
-    allPlayerActionsResolved() {
+    playerActionsResolved(player) {
         const gameStatus = {
             bust: "bust",
             stand: "stand",
             surrender: "surrender",
         };
-        for (let player of this.players) {
-            if (player.gameStatus == null)
-                return false;
-            if (gameStatus[player.gameStatus] == undefined)
-                return false;
-        }
+        if (player.gameStatus == null)
+            return false;
+        if (gameStatus[player.gameStatus] == undefined)
+            return false;
         return true;
     }
     addResultLogs() {
@@ -145,25 +160,26 @@ export class Table {
         for (let player of this.players) {
             let log = {};
             log["name"] = player.name;
-            log["action"] = player.gameStatus;
             log["bet"] = player.bet.toString();
             log["won"] = player.winAmount.toString();
             logs.push(log);
         }
         this.resultsLog.push(logs);
     }
-    dealerAction() {
-        while (this.house.getHandScore() < 18) {
-            this.house.takeAction("hit");
-            this.evaluateMove(this.house);
-        }
-    }
     startNextGame() {
-        this.blackjackClearPlayerHandsAndBets();
-        this.blackjackAssignPlayerHands();
+        this.clearPlayerHandsAndBets();
+        this.assignPlayerHands();
         this.gamePhase = "betting";
         this.house.hand = [];
         this.house.getCard(this.deck.drawOne());
+    }
+    isGameOver() {
+        for (let player of this.players) {
+            if (player.chips <= 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 //# sourceMappingURL=Table.js.map
